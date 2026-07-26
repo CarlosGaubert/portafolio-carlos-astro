@@ -1,0 +1,128 @@
+---
+const { patchImage, nameProject, descriptionProject, githubUrl } = Astro.props;
+---
+
+<div class="box place-self-center grid-item">
+  <div class="image-container h-24 z-20">
+    <img
+      src={patchImage}
+      alt="card"
+      class="object-cover h-24 w-96 pt-[10px] z-20 rounded-t-[20px]"
+    />
+  </div>
+
+  <div class="relative w-full h-full p-5 z-20">
+    <div class="flex flex-row justify-between">
+      <p class="text-lg font-bold">{nameProject}</p>
+
+      <a href={githubUrl} target="_blank" class="github-icon">
+        <img
+          class="bg-white rounded-full"
+          src="/portafolio_carlos_astro/github.webp"
+          alt="GitHub"
+        />
+      </a>
+    </div>
+    <p
+      class="text-sm text-zinc-400 mt-2 h-20 overflow-scroll overflow-x-hidden
+                scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+         scrollbar-thumb-black scrollbar-track-zinc-900 overflow-y-scroll"
+    >
+      {descriptionProject}
+    </p>
+  </div>
+</div>
+
+<style>
+  .box {
+    position: relative;
+    width: 400px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    -ms-align-items: center;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.15);
+    transition-duration: 0.2s;
+  }
+
+  .box:hover {
+    box-shadow:
+      0 8px 16px rgba(255, 255, 255, 0.2),
+      0 12px 40px rgba(255, 255, 255, 0.2);
+    scale: 1.05;
+  }
+  .box h2 {
+    color: rgb(226, 226, 226);
+    font-size: 2rem;
+    text-shadow: 2px, 2px, black;
+    z-index: 2;
+  }
+
+  .box::after {
+    content: "";
+    position: absolute;
+    background: rgb(25, 25, 25);
+    inset: 5px;
+    border-radius: 16px;
+  }
+
+  .box::before {
+    content: "";
+    position: absolute;
+    width: 140px;
+    height: 190%;
+    background: linear-gradient(#00ccff, #d500f9);
+    animation: rotate 4s linear infinite;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes initialAnimation {
+    from {
+      transform: scale(1.05);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes hoverAnimation {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.05);
+    }
+  }
+
+  .image-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .github-icon {
+    position: inherit;
+
+    top: 19px;
+    left: 10px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .github-icon img {
+    width: 100%;
+    height: 100%;
+  }
+</style>

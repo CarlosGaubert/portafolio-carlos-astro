@@ -1,0 +1,25 @@
+---
+const {
+  dateExperience,
+  titleExperience,
+  descriptionExperience,
+  companyExperience,
+  cityCompanyExperience,
+} = Astro.props;
+---
+
+<li class="mb-10 ms-4">
+  <time
+    class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-300"
+    >{dateExperience}</time
+  >
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+    {companyExperience} ({cityCompanyExperience})
+  </h2>
+  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+    {titleExperience}
+  </h3>
+  <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+    {descriptionExperience}
+  </p>
+</li>

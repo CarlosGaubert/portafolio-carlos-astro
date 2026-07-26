@@ -1,0 +1,37 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import CardProject from "@/components/CardProject.astro";
+import { repositories } from "@/lib/dataProjects";
+import { slide } from "astro:transitions";
+---
+
+<Layout title="Proyectos.">
+  <div
+    class="grid justify-center items-center
+      lg:grid-cols-2 xl:grid-cols-3 grid-cols-1 pl-10 pr-10 gap-y-10 pt-32 pb-32"
+    transition:animate={slide({
+      duration: "1s",
+    })}
+    transition:name="main"
+  >
+    {
+      repositories.map((repo: any) => (
+        <CardProject
+          nameProject={repo.nameProject}
+          descriptionProject={repo.descriptionProject}
+          patchImage={repo.patchImage}
+          githubUrl={repo.githubUrl}
+        />
+      ))
+    }
+  </div>
+</Layout>
+<style>
+  main {
+    margin: auto;
+  }
+
+  .adelante {
+    z-index: 100;
+  }
+</style>

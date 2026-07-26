@@ -1,0 +1,212 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import Navbar from "@/components/Navbar.astro";
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" href="/portafolio_carlos_astro/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ViewTransitions />
+  </head>
+  <body>
+    <Navbar />
+    <div class="star star1" transition:persist></div>
+    <div class="star star2" transition:persist></div>
+    <div class="star star3" transition:persist></div>
+    <div class="star star4" transition:persist></div>
+    <div class="star star5" transition:persist></div>
+    <div class="star star6" transition:persist></div>
+    <div class="star star7" transition:persist></div>
+    <div class="star star8" transition:persist></div>
+
+    <slot />
+    <script>
+      // Efecto feedback del mouse
+      document.addEventListener("mousemove", function (e) {
+        const feedback = document.querySelector(
+          ".feedback",
+        ) as HTMLElement | null;
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        if (feedback) {
+          feedback.style.left = mouseX + "px";
+          feedback.style.top = mouseY + "px";
+        }
+      });
+
+      // Persistir el estado de las animaciones de las estrellas de fondo
+      let starAnimationStates: { name: string; currentTime: CSSNumberish | null }[][] = [];
+
+      document.addEventListener("astro:before-swap", () => {
+        const stars = document.querySelectorAll(".star");
+        starAnimationStates = Array.from(stars).map((star) => {
+          return star.getAnimations().map((anim) => ({
+            name: "animationName" in anim ? (anim as any).animationName : "",
+            currentTime: anim.currentTime,
+          }));
+        });
+      });
+
+      document.addEventListener("astro:after-swap", () => {
+        const stars = document.querySelectorAll(".star");
+        stars.forEach((star, index) => {
+          const savedAnims = starAnimationStates[index];
+          if (!savedAnims) return;
+
+          // Esperamos al siguiente frame para asegurarnos de que el navegador
+          // haya re-inicializado las animaciones antes de restaurar su currentTime.
+          requestAnimationFrame(() => {
+            const currentAnims = star.getAnimations();
+            currentAnims.forEach((anim) => {
+              const animName = "animationName" in anim ? (anim as any).animationName : "";
+              const saved = savedAnims.find((sa) => sa.name === animName);
+              if (saved && saved.currentTime !== null) {
+                anim.currentTime = saved.currentTime;
+              }
+            });
+          });
+        });
+      });
+    </script>
+    <div transition:persist class="feedback z-0"></div>
+    <style is:global>
+      body {
+        --sb-track-color: #232e33;
+        --sb-thumb-color: #211f1f;
+        --sb-size: 0px;
+      }
+
+      body::-webkit-scrollbar {
+        width: var(--sb-size);
+      }
+
+      body::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+        border-radius: 27px;
+      }
+
+      body::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 27px;
+      }
+
+      @supports not selector(::-webkit-scrollbar) {
+        body {
+          scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+        }
+      }
+
+      html {
+        font-family: "Montserrat", system-ui, sans-serif;
+        background: #000000;
+        color: White;
+      }
+      body {
+        margin: 0;
+        height: 100dvh;
+      }
+
+      .star {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        animation:
+          animate 8s ease-in-out infinite,
+          backgroundmove 16s linear infinite;
+      }
+
+      .star1 {
+        animation-delay: 0s;
+        background: url("/portafolio_carlos_astro/stars/star1.png");
+      }
+
+      .star2 {
+        animation-delay: -1s;
+        background: url("/portafolio_carlos_astro/stars/star2.png");
+      }
+
+      .star3 {
+        animation-delay: -2s;
+        background: url("/portafolio_carlos_astro/stars/star3.png");
+      }
+
+      .star4 {
+        animation-delay: -3s;
+        background: url("/portafolio_carlos_astro/stars/star4.png");
+      }
+
+      .star5 {
+        animation-delay: -4s;
+        background: url("/portafolio_carlos_astro/stars/star5.png");
+      }
+
+      .star6 {
+        animation-delay: -5s;
+        background: url("/portafolio_carlos_astro/stars/star6.png");
+      }
+
+      .star7 {
+        animation-delay: -6s;
+        background: url("/portafolio_carlos_astro/stars/star7.png");
+      }
+
+      .star8 {
+        animation-delay: -7s;
+        background: url("/portafolio_carlos_astro/stars/star8.png");
+      }
+
+      @keyframes animate {
+        0%,
+        20%,
+        40%,
+        60%,
+        80%,
+        100% {
+          opacity: 0;
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes backgroundmove {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(2);
+        }
+      }
+
+      .feedback {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition:
+          transform 0.1s ease,
+          box-shadow 0.5s ease;
+        box-shadow: 0 0 400px 150px rgba(250, 250, 250, 0.1);
+        z-index: -1;
+      }
+    </style>
+  </body>
+</html>

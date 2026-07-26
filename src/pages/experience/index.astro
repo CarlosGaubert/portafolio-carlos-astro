@@ -1,0 +1,32 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { slide } from "astro:transitions";
+import { experiences } from "@/lib/dataExperience";
+import ItemExperience from "@/components/ItemExperience.astro";
+---
+
+<Layout title="Experiencia">
+  <div
+    transition:name="main"
+    transition:animate={slide({
+      duration: "1s",
+    })}
+    class="flex flex-col items-center justify-center pt-28 pb-28 md:pl-28 md:pr-28 pl-5 pr-5"
+  >
+    <ol
+      class="border-gray-200 dark:border-gray-700 bg-gray-700 bg-opacity-40 pl-10 pr-10 md:pl-24 md:pr-24 border rounded-xl pt-20 pb-20"
+    >
+      {
+        experiences.map((experience) => (
+          <ItemExperience
+            dateExperience={experience.dateExperience}
+            titleExperience={experience.titleExperience}
+            descriptionExperience={experience.descriptionExperience}
+            companyExperience={experience.companyExperience}
+            cityCompanyExperience={experience.cityCompanyExperience}
+          />
+        ))
+      }
+    </ol>
+  </div>
+</Layout>

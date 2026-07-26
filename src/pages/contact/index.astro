@@ -1,0 +1,135 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { slide } from "astro:transitions";
+import GithubIcon from "@/components/Icons/GithubIcon.astro";
+import LinkedinIcon from "@/components/Icons/LinkedinIcon.astro";
+import GmailIcon from "@/components/Icons/GmailIcon.astro";
+---
+
+<Layout title="Contacto">
+  <div
+    class="flex justify-center items-center w-full h-full"
+    transition:name="main"
+    transition:animate={slide({
+      duration: "1s",
+    })}
+  >
+    <div class="container">
+      <div class="card max-w-[300px] sm:max-w-[500px] lg:max-w-3xl">
+        <p class="text-[20px] md:text-[35px] font-bold pb-10">
+          Si quieres puedes contactarte conmigo, puedes hacerlo bajo los
+          siguientes medios:
+        </p>
+        <div class="flex justify-center space-x-8">
+          <a href="mailto:carlosgaubertquijada@gmail.com" target="_blank">
+            <button
+              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
+            >
+              <GmailIcon width="50px" height="50px" />
+            </button>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/carlos-christopher-gaubert-quijada-9832b1b9/"
+            target="_blank"
+          >
+            <button
+              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
+            >
+              <LinkedinIcon width="50px" height="50px" />
+            </button>
+          </a>
+          <a href="https://github.com/CarlosGaubertQ" target="_blank">
+            <button
+              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
+            >
+              <GithubIcon width="50px" height="50px" />
+            </button></a
+          >
+        </div>
+      </div>
+      <script lang="javascript" is:inline>
+        (function () {
+          let card = document.querySelector(".card");
+
+          document.addEventListener("mousemove", (e) => {
+            rotateElement(e, card);
+          });
+
+          function rotateElement(event, element) {
+            // get mouse position
+            const x = event.clientX;
+            const y = event.clientY;
+
+            // find the middle
+            const middleX = window.innerWidth / 2;
+            const middleY = window.innerHeight / 2;
+
+            // get offset from middle as a percentage
+            // and tone it down a little
+            const offsetX = ((x - middleX) / middleX) * 5;
+            const offsetY = ((y - middleY) / middleY) * 5;
+
+            // set rotation
+            element.style.setProperty("--rotateX", offsetX + "deg");
+            element.style.setProperty("--rotateY", -1 * offsetY + "deg");
+          }
+        })();
+      </script>
+      <style>
+        .container {
+          background-blend-mode: multiply;
+          min-block-size: 100dvh;
+          display: grid;
+          place-items: center;
+        }
+
+        .card {
+          --selector: var(--pink);
+          --property: var(--teal);
+          --punctuation: var(--white);
+          --undefined: var(--white);
+          color: var(--undefined);
+          background: hsl(222, 45%, 7%);
+          padding: 2rem;
+          border-radius: 1rem;
+          margin: auto;
+          position: relative;
+
+          transform-style: preserve-3d;
+          transform: perspective(20000px) rotateY(var(--rotateX))
+            rotateX(var(--rotateY));
+        }
+
+        .card > * {
+          text-shadow: 0 0 0.3em currentColor;
+        }
+
+        .card::before,
+        .card::after {
+          content: "";
+          position: absolute;
+          border-radius: inherit;
+        }
+
+        /* shadow */
+        .card::before {
+          inset: 0.75rem;
+          border-radius: inherit;
+          background: black;
+          z-index: -1;
+          transform: translateZ(-50px);
+          filter: blur(15px);
+          opacity: 0.5;
+        }
+
+        /* gradient thingy */
+        .card::after {
+          z-index: -2;
+          inset: -1rem;
+          background: linear-gradient(-45deg, #d500f9, #00ccff);
+          transform: translateZ(-50px);
+        }
+      </style>
+    </div>
+  </div>
+</Layout>

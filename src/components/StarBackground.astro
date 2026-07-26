@@ -1,0 +1,94 @@
+---
+// StarBackground.astro
+import { ViewTransitions } from "astro:transitions";
+---
+
+<ViewTransitions />
+<div class="star star1" transition:persist></div>
+<!--<div class="star star2"></div>-->
+<!--<div class="star star3"></div>-->
+<!--<div class="star star4"></div>-->
+<!--<div class="star star5"></div>-->
+<!--<div class="star star6"></div>-->
+<!--<div class="star star7"></div>-->
+<!--<div class="star star8"></div>-->
+<style>
+  .star {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    animation:
+      animate 8s ease-in-out infinite,
+      backgroundmove 16s linear infinite;
+  }
+
+  .star1 {
+    animation-delay: 0s;
+    background: url("/portafolio_carlos_astro/stars/star1.png");
+  }
+
+  .star2 {
+    animation-delay: -1s;
+    background: url("/portafolio_carlos_astro/stars/star2.png");
+  }
+
+  .star3 {
+    animation-delay: -2s;
+    background: url("/portafolio_carlos_astro/stars/star3.png");
+  }
+
+  .star4 {
+    animation-delay: -3s;
+    background: url("/portafolio_carlos_astro/stars/star4.png");
+  }
+
+  .star5 {
+    animation-delay: -4s;
+    background: url("/portafolio_carlos_astro/stars/star5.png");
+  }
+
+  .star6 {
+    animation-delay: -5s;
+    background: url("/portafolio_carlos_astro/stars/star6.png");
+  }
+
+  .star7 {
+    animation-delay: -6s;
+    background: url("/portafolio_carlos_astro/stars/star7.png");
+  }
+
+  .star8 {
+    animation-delay: -7s;
+    background: url("/portafolio_carlos_astro/stars/star8.png");
+  }
+
+  @keyframes animate {
+    0%,
+    20%,
+    40%,
+    60%,
+    80%,
+    100% {
+      opacity: 0;
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes backgroundmove {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(2);
+    }
+  }
+</style>

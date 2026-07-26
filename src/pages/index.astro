@@ -1,0 +1,58 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ProfileImage from "@/components/ProfileImage.astro";
+import { fade } from "astro:transitions";
+---
+
+<Layout title="Portafolio Carlos Gaubert Quijada.">
+  <div
+    class="flex flex-col items-center justify-center h-screen animate-fade md:mb-0"
+    transition:animate={fade({
+      duration: "0.5s",
+    })}
+    transition:name="main"
+  >
+    <div class="flex md:flex-row flex-col flex-grow flex-1 w-full pt-5 md:pt-0">
+      <div
+        class="md:flex-1 pt-32 md:pt-0 flex flex-col gap-4 pl-10 pr-10 md:pl-28 md:pr-28 justify-center"
+      >
+        <h1 class="lg:text-6xl text-4xl font-bold">
+          Hola, soy Carlos Gaubert Quijada.
+        </h1>
+        <p class="text-lg text-zinc-200">
+          Soy ingeniero de software y un apasionado de la tecnología, me encanta
+          aprender cosas nuevas y compartir mis conocimientos con los demás.
+        </p>
+
+        <p class="text-lg">
+          Echa un vistazo a mis
+          <a
+            class="hover:animate-pulse font-bold text-[#00ccff]"
+            href="/portafolio_carlos_astro/projects/">Proyectos</a
+          > y mi <a
+            class="hover:animate-pulse font-bold text-[#00ccff]"
+            href="https://github.com/CarlosGaubertQ"
+            target="_blank">Github</a
+          >.
+        </p>
+      </div>
+      <div
+        class="flex pt-16 md:mb-10 xl:pr-32 items-center justify-center md:pr-20 md:flex-1 mb-28"
+      >
+        <ProfileImage />
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+</style>
