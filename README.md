@@ -13,9 +13,9 @@
   </p>
 
   <h4>
-    <a href="https://carlosgaubertq.github.io/portafolio_carlos_astro/">✨ Ver Demo en Vivo</a>
+    <a href="https://carlosgaubert.github.io/portafolio-carlos-astro/">✨ Ver Demo en Vivo</a>
     ·
-    <a href="https://github.com/CarlosGaubertQ/portafolio_carlos_astro/issues">🐛 Reportar un Problema</a>
+    <a href="https://github.com/CarlosGaubert/portafolio-carlos-astro/issues">🐛 Reportar un Problema</a>
   </h4>
 </div>
 
@@ -93,8 +93,8 @@ Se recomienda tener instalado [Bun](https://bun.sh/) para un rendimiento más r�
 ### Paso 1: Clonar el Repositorio
 
 ```bash
-git clone https://github.com/CarlosGaubertQ/portafolio_carlos_astro.git
-cd portafolio_carlos_astro
+git clone https://github.com/CarlosGaubert/portafolio-carlos-astro.git
+cd portafolio-carlos-astro
 ```
 
 ### Paso 2: Instalar Dependencias
@@ -115,7 +115,7 @@ Inicia el entorno de desarrollo local:
 bun run dev
 ```
 
-El proyecto estará disponible en [http://localhost:4321/portafolio_carlos_astro](http://localhost:4321/portafolio_carlos_astro).
+El proyecto estará disponible en [http://localhost:4321/portafolio-carlos-astro](http://localhost:4321/portafolio-carlos-astro).
 
 ### Paso 4: Construir para Producción
 
@@ -156,4 +156,4 @@ Si deseas ponerte en contacto conmigo para discutir oportunidades laborales, pro
 
 *   **📧 Correo Electrónico:** [carlosgaubertquijada@gmail.com](mailto:carlosgaubertquijada@gmail.com)
 *   **💼 LinkedIn:** [Carlos Gaubert Quijada](https://www.linkedin.com/in/carlos-gaub-quijada/)
-*   **💻 GitHub:** [@CarlosGaubertQ](https://github.com/CarlosGaubertQ)
+*   **💻 GitHub:** [@CarlosGaubert](https://github.com/CarlosGaubert)
