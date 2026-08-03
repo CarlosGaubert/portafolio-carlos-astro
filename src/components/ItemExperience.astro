@@ -1,10 +1,13 @@
 ---
+import GithubIcon from "@/components/Icons/GithubIcon.astro";
+
 const {
   dateExperience,
   titleExperience,
   descriptionExperience,
   companyExperience,
   cityCompanyExperience,
+  githubUrl,
 } = Astro.props;
 ---
 
@@ -13,13 +16,35 @@ const {
     class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-300"
     >{dateExperience}</time
   >
-  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-    {companyExperience} ({cityCompanyExperience})
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
+    {
+      githubUrl ? (
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-[#00ccff] hover:underline transition-colors flex items-center gap-2"
+        >
+          {companyExperience}
+          <span class="inline-block w-5 h-5 flex-shrink-0">
+            <GithubIcon width="20" height="20" />
+          </span>
+        </a>
+      ) : (
+        companyExperience
+      )
+    }
+    <span class="text-sm font-normal text-gray-400 dark:text-zinc-500">
+      ({cityCompanyExperience})
+    </span>
   </h2>
-  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-    {titleExperience}
-  </h3>
+  {titleExperience && (
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+      {titleExperience}
+    </h3>
+  )}
   <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
     {descriptionExperience}
   </p>
 </li>
+
