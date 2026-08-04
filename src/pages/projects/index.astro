@@ -1,8 +1,54 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import CardProject from "@/components/CardProject.astro";
-import { repositories } from "@/lib/dataProjects";
+import { repositories as fallbackRepositories } from "@/lib/dataProjects";
 import { slide } from "astro:transitions";
+
+let projects: any[] = [];
+try {
+  const response = await fetch(
+    "https://api.github.com/users/CarlosGaubert/repos?sort=updated&per_page=100"
+  );
+  if (response.ok) {
+    const rawRepos = await response.json();
+    const repos = Array.isArray(rawRepos) ? rawRepos.filter((repo: any) => !repo.fork) : [];
+    projects = repos.map((repo: any) => ({
+      nameProject: repo.name,
+      descriptionProject: repo.description || "Sin descripción disponible.",
+      patchImage: getImageForLanguage(repo.language, repo.name),
+      githubUrl: repo.html_url,
+    }));
+  }
+} catch (error) {
+  console.error("Error fetching GitHub repos, using local fallback:", error);
+}
+
+if (!projects || projects.length === 0) {
+  projects = fallbackRepositories;
+}
+
+function getImageForLanguage(language: string, name: string) {
+  const lang = (language || "").toLowerCase();
+  const repoName = (name || "").toLowerCase();
+
+  if (lang === "astro" || repoName.includes("astro")) {
+    return "/portafolio-carlos-astro/repositories/astro.webp";
+  }
+  if (lang === "python") {
+    return "/portafolio-carlos-astro/repositories/pytorch.png";
+  }
+  if (lang === "react" || repoName.includes("react")) {
+    return "/portafolio-carlos-astro/repositories/React.png";
+  }
+  if (lang === "javascript" || lang === "typescript" || repoName.includes("node")) {
+    return "/portafolio-carlos-astro/repositories/node.png";
+  }
+  if (lang === "java" || lang === "kotlin" || repoName.includes("android")) {
+    return "/portafolio-carlos-astro/repositories/javaandroid.jpeg";
+  }
+
+  return "/portafolio-carlos-astro/github.webp";
+}
 ---
 
 <Layout title="Proyectos.">
@@ -15,7 +61,7 @@ import { slide } from "astro:transitions";
     transition:name="main"
   >
     {
-      repositories.map((repo: any) => (
+      projects.map((repo: any) => (
         <CardProject
           nameProject={repo.nameProject}
           descriptionProject={repo.descriptionProject}
