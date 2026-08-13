@@ -1,5 +1,6 @@
 ---
-const { patchImage, nameProject, descriptionProject, githubUrl } = Astro.props;
+const { patchImage, nameProject, descriptionProject, githubUrl, tags = [] } = Astro.props;
+import { getTechIconUrl } from "@/lib/dataProjects";
 ---
 
 <div class="box place-self-center grid-item">
@@ -24,12 +25,30 @@ const { patchImage, nameProject, descriptionProject, githubUrl } = Astro.props;
       </a>
     </div>
     <p
-      class="text-sm text-zinc-400 mt-2 h-20 overflow-scroll overflow-x-hidden
+      class="text-sm text-zinc-400 mt-2 h-16 overflow-scroll overflow-x-hidden
                 scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full
          scrollbar-thumb-black scrollbar-track-zinc-900 overflow-y-scroll"
     >
       {descriptionProject}
     </p>
+
+    <!-- Tecnologías / Lenguajes del proyecto -->
+    {tags && tags.length > 0 && (
+      <div class="flex flex-row gap-1.5 mt-3 items-center flex-wrap">
+        {tags.map((tag: string) => (
+          <div class="bg-zinc-900/90 border border-zinc-800 rounded-full px-2 py-0.5 flex items-center gap-1.5 hover:border-zinc-700/80 transition-colors duration-200">
+            <img
+              src={getTechIconUrl(tag)}
+              alt={tag}
+              title={tag}
+              class="w-3.5 h-3.5 object-contain"
+              onerror="this.style.display='none'"
+            />
+            <span class="text-[10px] font-semibold text-zinc-300">{tag}</span>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 </div>
 
@@ -37,7 +56,7 @@ const { patchImage, nameProject, descriptionProject, githubUrl } = Astro.props;
   .box {
     position: relative;
     width: 400px;
-    height: 250px;
+    height: 280px;
     display: flex;
     flex-direction: column;
     -ms-align-items: center;

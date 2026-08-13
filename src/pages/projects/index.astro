@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import CardProject from "@/components/CardProject.astro";
-import { repositories as fallbackRepositories } from "@/lib/dataProjects";
+import { repositories as fallbackRepositories, getTechIconUrl, getTagsForProject } from "@/lib/dataProjects";
 import { slide } from "astro:transitions";
 
 let projects: any[] = [];
@@ -12,12 +12,16 @@ try {
   if (response.ok) {
     const rawRepos = await response.json();
     const repos = Array.isArray(rawRepos) ? rawRepos.filter((repo: any) => !repo.fork) : [];
-    projects = repos.map((repo: any) => ({
-      nameProject: repo.name,
-      descriptionProject: repo.description || "Sin descripción disponible.",
-      patchImage: getImageForLanguage(repo.language, repo.name),
-      githubUrl: repo.html_url,
-    }));
+    projects = repos.map((repo: any) => {
+      const description = repo.description || "Sin descripción disponible.";
+      return {
+        nameProject: repo.name,
+        descriptionProject: description,
+        patchImage: getImageForLanguage(repo.language, repo.name),
+        githubUrl: repo.html_url,
+        tags: getTagsForProject(repo.language, repo.name, description),
+      };
+    });
   }
 } catch (error) {
   console.error("Error fetching GitHub repos, using local fallback:", error);
@@ -47,6 +51,14 @@ function getImageForLanguage(language: string, name: string) {
     return "/portafolio-carlos-astro/repositories/javaandroid.jpeg";
   }
 
+  // Fallback a logo dinámico de Devicon
+  if (language) {
+    const deviconUrl = getTechIconUrl(language);
+    if (deviconUrl) {
+      return deviconUrl;
+    }
+  }
+
   return "/portafolio-carlos-astro/github.webp";
 }
 ---
@@ -67,6 +79,7 @@ function getImageForLanguage(language: string, name: string) {
           descriptionProject={repo.descriptionProject}
           patchImage={repo.patchImage}
           githubUrl={repo.githubUrl}
+          tags={repo.tags}
         />
       ))
     }
