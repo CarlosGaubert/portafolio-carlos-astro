@@ -1,43 +1,62 @@
-export const experiences = [
+export interface Experience {
+  dateExperience: string;
+  companyExperience: string;
+  cityCompanyExperience: string;
+  titleExperience: string;
+  descriptionExperience: string;
+  isCurrent?: boolean;
+  technologies: string[];
+}
+
+export const experiences: Experience[] = [
   {
     dateExperience: "Julio 2024 – Presente",
     companyExperience: "IT-CONSULTING SPA",
     cityCompanyExperience: "Santiago, Chile",
     titleExperience: "Ingeniero de Software",
     descriptionExperience:
-      "Se desarrolla en un proyecto de gestión de inventario, desarrollando un sistema basado en el patrón MVC con JavaScript, PHP y MySQL, optimizando operaciones mediante procedimientos almacenados.",
+      "Desarrollo y mantenimiento de sistema de gestión de inventario empresarial basado en arquitectura MVC. Optimización de consultas complejas y operaciones críticas mediante procedimientos almacenados en base de datos, garantizando alta disponibilidad y consistencia de datos.",
+    isCurrent: true,
+    technologies: ["JavaScript", "PHP", "MySQL", "MVC", "HTML5", "CSS3"],
   },
   {
     dateExperience: "Marzo 2023 – Marzo 2024",
     companyExperience: "Universidad del Bío-Bío",
     cityCompanyExperience: "Concepción, Chile",
-    titleExperience: "Investigador",
+    titleExperience: "Investigador & Desarrollador IA",
     descriptionExperience:
-      "Se participo de un proyecto FIC regional, del cual se realizó modelos VIT para clasificación de imágenes satelitales el cual fue hecho en Python usando Pytorch, se empleó un pequeño sistema para visualizar el comportamiento de los modelos utilizando Django.",
+      "Participación en proyecto FIC regional enfocado en visión por computadora e inteligencia artificial. Desarrollo de modelos Vision Transformer (ViT) para clasificación de imágenes satelitales y estimación de cobertura forestal. Implementación de plataforma web interactiva para visualización y análisis de comportamiento de los modelos.",
+    isCurrent: false,
+    technologies: ["Python", "PyTorch", "Django", "OpenCV", "Machine Learning"],
   },
   {
     dateExperience: "Octubre 2021 – Enero 2022",
     companyExperience: "IT-CONSULTING SPA",
     cityCompanyExperience: "Santiago, Chile",
-    titleExperience: "Ingeniero de Software",
+    titleExperience: "Ingeniero de Software (Líder de Proyecto)",
     descriptionExperience:
-      "Se desarrolló y lideró un proyecto de gestión de frutas para una empresa exportadora, implementando un sistema basado en el patrón MVC con JavaScript, PHP y MySQL, optimizando operaciones mediante procedimientos almacenados. Se utilizó Bootstrap para el diseño de la interfaz.",
+      "Liderazgo y desarrollo integral de software de gestión logística y trazabilidad de frutas para empresa agroexportadora. Diseño de base de datos relacional y lógica de negocio bajo patrón MVC, optimizando flujos de despacho y control de calidad.",
+    isCurrent: false,
+    technologies: ["JavaScript", "PHP", "MySQL", "Bootstrap", "MVC"],
   },
   {
-    dateExperience: "Junio 2020 – Abril 2020",
+    dateExperience: "Abril 2020 – Junio 2020",
     companyExperience: "IT-CONSULTING SPA",
     cityCompanyExperience: "Santiago, Chile",
     titleExperience: "Ingeniero de Software",
     descriptionExperience:
-      "Se desarrollo un sistema de gestión de inventario utilizando JavaScript, PHP y MySQL. Responsable de diseñar e implementar varios módulos CRUD para manejar eficientemente el inventario, utilizando procedimientos almacenados en MySQL para garantizar un rendimiento óptimo y una gestión de datos segura.",
+      "Diseño e implementación de módulos CRUD de alta concurrencia para gestión de inventarios y bodegas. Creación de procedimientos almacenados en MySQL para asegurar integridad transaccional y rendimiento óptimo en la manipulación masiva de registros.",
+    isCurrent: false,
+    technologies: ["JavaScript", "PHP", "MySQL", "CSS3"],
   },
-
   {
-    dateExperience: "Junio 2018 – Abril 2018",
-    companyExperience: "Hospital las Higueras",
+    dateExperience: "Junio 2018 – Julio 2018",
+    companyExperience: "Hospital Las Higueras",
     cityCompanyExperience: "Talcahuano, Chile",
-    titleExperience: "Soporte Técnico",
+    titleExperience: "Soporte Técnico & Redes TI",
     descriptionExperience:
-      "Como responsable de soporte de TI en un entorno médico, se desempeñó un papel clave en la gestión de equipos, enrutamiento de direcciones IP e implementación de software especializado para una administración eficiente. Se mantuvo una estrecha interacción con el personal médico y administrativo, facilitando una comunicación efectiva y proporcionando soluciones tecnológicas óptimas para respaldar las operaciones críticas.",
+      "Gestión de infraestructura informática en entorno hospitalario de alta exigencia: configuración de equipos clínicos, enrutamiento IP, despliegue de software médico y atención de incidencias críticas para asegurar la continuidad operativa de los servicios de salud.",
+    isCurrent: false,
+    technologies: ["Redes", "Soporte TI", "Hardware", "Linux", "Windows"],
   },
 ];

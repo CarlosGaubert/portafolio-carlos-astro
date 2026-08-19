@@ -6,130 +6,292 @@ import LinkedinIcon from "@/components/Icons/LinkedinIcon.astro";
 import GmailIcon from "@/components/Icons/GmailIcon.astro";
 ---
 
-<Layout title="Contacto">
-  <div
-    class="flex justify-center items-center w-full h-full"
+<Layout title="Contacto | Carlos Gaubert">
+  <main
+    class="min-h-screen w-full flex flex-col justify-center items-center pt-24 pb-20 px-4 sm:px-6 lg:px-8"
     transition:name="main"
     transition:animate={slide({
-      duration: "1s",
+      duration: "0.8s",
     })}
   >
-    <div class="container">
-      <div class="card max-w-[300px] sm:max-w-[500px] lg:max-w-3xl">
-        <p class="text-[20px] md:text-[35px] font-bold pb-10">
-          Si quieres puedes contactarte conmigo, puedes hacerlo bajo los
-          siguientes medios:
-        </p>
-        <div class="flex justify-center space-x-8">
-          <a href="mailto:carlosgaubertquijada@gmail.com" target="_blank">
-            <button
-              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
-            >
-              <GmailIcon width="50px" height="50px" />
-            </button>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/carlos-christopher-gaubert-quijada-9832b1b9/"
-            target="_blank"
-          >
-            <button
-              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
-            >
-              <LinkedinIcon width="50px" height="50px" />
-            </button>
-          </a>
-          <a href="https://github.com/CarlosGaubert" target="_blank">
-            <button
-              class="flex-shrink-0 hover:animate-wiggle-more hover:animate-infinite hover:animate-ease-in-out"
-            >
-              <GithubIcon width="50px" height="50px" />
-            </button></a
-          >
-        </div>
+    <!-- Contenedor Principal con efecto 3D -->
+    <div class="contact-wrapper w-full max-w-4xl flex flex-col items-center">
+      
+      <!-- Badge de Estado -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-6 backdrop-blur-md shadow-lg animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Disponible para nuevos proyectos e ideas</span>
       </div>
-      <script lang="javascript" is:inline>
-        (function () {
-          let card = document.querySelector(".card");
 
-          document.addEventListener("mousemove", (e) => {
-            rotateElement(e, card);
-          });
+      <!-- Título de Sección -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+          ¿Tienes una idea o proyecto? <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00ccff] to-[#d500f9]">¡Hablemos!</span>
+        </h1>
+        <p class="text-zinc-400 text-sm sm:text-base mt-3 max-w-xl mx-auto">
+          Ponte en contacto conmigo por cualquiera de mis canales oficiales o envíame un mensaje directo.
+        </p>
+      </div>
 
-          function rotateElement(event, element) {
-            // get mouse position
-            const x = event.clientX;
-            const y = event.clientY;
+      <!-- Tarjeta 3D Principal -->
+      <div class="contact-3d-card w-full bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-6 sm:p-10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+        
+        <!-- Efecto de gradiente de fondo ambiental -->
+        <div class="absolute -top-32 -left-32 w-64 h-64 bg-[#00ccff]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-[#d500f9]/15 rounded-full blur-3xl pointer-events-none"></div>
 
-            // find the middle
-            const middleX = window.innerWidth / 2;
-            const middleY = window.innerHeight / 2;
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+          
+          <!-- Columna Izquierda: Tarjetas de Canales de Contacto -->
+          <div class="lg:col-span-5 flex flex-col gap-4 justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-white mb-1">Medios de contacto</h2>
+              <p class="text-xs text-zinc-400 mb-5">Haz clic para interactuar o copiar enlace directo.</p>
 
-            // get offset from middle as a percentage
-            // and tone it down a little
-            const offsetX = ((x - middleX) / middleX) * 5;
-            const offsetY = ((y - middleY) / middleY) * 5;
+              <!-- Tarjeta de Email -->
+              <div class="group bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 hover:border-[#00ccff]/50 rounded-2xl p-4 transition-all duration-300 shadow-md">
+                <div class="flex items-center gap-3">
+                  <div class="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+                    <GmailIcon width="24px" height="24px" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-zinc-400">Correo Electrónico</p>
+                    <p class="text-xs sm:text-sm font-semibold text-zinc-100 truncate" id="email-text">
+                      carlosgaubertquijada@gmail.com
+                    </p>
+                  </div>
+                </div>
 
-            // set rotation
-            element.style.setProperty("--rotateX", offsetX + "deg");
-            element.style.setProperty("--rotateY", -1 * offsetY + "deg");
-          }
-        })();
-      </script>
-      <style>
-        .container {
-          background-blend-mode: multiply;
-          min-block-size: 100dvh;
-          display: grid;
-          place-items: center;
-        }
+                <div class="mt-3 pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+                  <button
+                    id="copy-email-btn"
+                    type="button"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-[#00ccff]/20 text-xs font-medium text-zinc-300 hover:text-[#00ccff] border border-zinc-700 hover:border-[#00ccff]/50 transition-all cursor-pointer"
+                  >
+                    <svg id="copy-icon" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span id="copy-text">Copiar email</span>
+                  </button>
 
-        .card {
-          --selector: var(--pink);
-          --property: var(--teal);
-          --punctuation: var(--white);
-          --undefined: var(--white);
-          color: var(--undefined);
-          background: hsl(222, 45%, 7%);
-          padding: 2rem;
-          border-radius: 1rem;
-          margin: auto;
-          position: relative;
+                  <a
+                    href="mailto:carlosgaubertquijada@gmail.com"
+                    class="text-xs text-[#00ccff] hover:underline font-semibold flex items-center gap-1"
+                  >
+                    Enviar correo &rarr;
+                  </a>
+                </div>
+              </div>
 
-          transform-style: preserve-3d;
-          transform: perspective(20000px) rotateY(var(--rotateX))
-            rotateX(var(--rotateY));
-        }
+              <!-- Tarjeta de LinkedIn -->
+              <a
+                href="https://www.linkedin.com/in/carlos-christopher-gaubert-quijada-9832b1b9/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group block bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 hover:border-[#00ccff]/50 rounded-2xl p-4 mt-3 transition-all duration-300 shadow-md"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                      <LinkedinIcon width="24px" height="24px" />
+                    </div>
+                    <div>
+                      <p class="text-xs font-medium text-zinc-400">LinkedIn</p>
+                      <p class="text-xs sm:text-sm font-semibold text-zinc-100 group-hover:text-[#00ccff] transition-colors">
+                        Carlos Christopher Gaubert
+                      </p>
+                    </div>
+                  </div>
+                  <span class="text-zinc-500 group-hover:text-[#00ccff] transition-colors">&nearr;</span>
+                </div>
+              </a>
 
-        .card > * {
-          text-shadow: 0 0 0.3em currentColor;
-        }
+              <!-- Tarjeta de GitHub -->
+              <a
+                href="https://github.com/CarlosGaubert"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group block bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 hover:border-[#d500f9]/50 rounded-2xl p-4 mt-3 transition-all duration-300 shadow-md"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <GithubIcon width="24px" height="24px" />
+                    </div>
+                    <div>
+                      <p class="text-xs font-medium text-zinc-400">GitHub</p>
+                      <p class="text-xs sm:text-sm font-semibold text-zinc-100 group-hover:text-[#d500f9] transition-colors">
+                        @CarlosGaubert
+                      </p>
+                    </div>
+                  </div>
+                  <span class="text-zinc-500 group-hover:text-[#d500f9] transition-colors">&nearr;</span>
+                </div>
+              </a>
+            </div>
+          </div>
 
-        .card::before,
-        .card::after {
-          content: "";
-          position: absolute;
-          border-radius: inherit;
-        }
+          <!-- Columna Derecha: Formulario de Mensaje Rápido -->
+          <div class="lg:col-span-7 bg-zinc-900/50 border border-zinc-800/90 rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-white mb-1">Envíame un mensaje rápido</h2>
+              <p class="text-xs text-zinc-400 mb-5">
+                Escribe tu asunto y mensaje; al presionar enviar se abrirá tu gestor de correo listo para despachar.
+              </p>
 
-        /* shadow */
-        .card::before {
-          inset: 0.75rem;
-          border-radius: inherit;
-          background: black;
-          z-index: -1;
-          transform: translateZ(-50px);
-          filter: blur(15px);
-          opacity: 0.5;
-        }
+              <form id="quick-contact-form" class="space-y-4">
+                <div>
+                  <label for="contact-name" class="block text-xs font-semibold text-zinc-300 mb-1.5 uppercase tracking-wider">Tu Nombre</label>
+                  <input
+                    type="text"
+                    id="contact-name"
+                    required
+                    placeholder="Ej. Juan Pérez"
+                    class="w-full px-4 py-2.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00ccff] focus:ring-1 focus:ring-[#00ccff] transition-all"
+                  />
+                </div>
 
-        /* gradient thingy */
-        .card::after {
-          z-index: -2;
-          inset: -1rem;
-          background: linear-gradient(-45deg, #d500f9, #00ccff);
-          transform: translateZ(-50px);
-        }
-      </style>
+                <div>
+                  <label for="contact-subject" class="block text-xs font-semibold text-zinc-300 mb-1.5 uppercase tracking-wider">Asunto</label>
+                  <input
+                    type="text"
+                    id="contact-subject"
+                    required
+                    placeholder="Ej. Propuesta de proyecto / Consulta"
+                    class="w-full px-4 py-2.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00ccff] focus:ring-1 focus:ring-[#00ccff] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label for="contact-message" class="block text-xs font-semibold text-zinc-300 mb-1.5 uppercase tracking-wider">Mensaje</label>
+                  <textarea
+                    id="contact-message"
+                    rows="4"
+                    required
+                    placeholder="Cuéntame sobre tu proyecto, requerimientos o duda..."
+                    class="w-full px-4 py-2.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#00ccff] focus:ring-1 focus:ring-[#00ccff] transition-all resize-none"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full py-3 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#00ccff] to-[#d500f9] hover:opacity-90 active:scale-[0.99] transition-all duration-200 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  <span>Enviar Mensaje</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-  </div>
+
+    <!-- Toast Notification de Copiado -->
+    <div
+      id="copy-toast"
+      class="fixed bottom-8 right-8 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-zinc-900 border border-[#00ccff]/50 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2"
+    >
+      <span class="text-[#00ccff]">✓</span>
+      <span>¡Correo copiado al portapapeles!</span>
+    </div>
+  </main>
 </Layout>
+
+<script is:inline>
+  function setupContactPage() {
+    // 1. Efecto 3D Tilt suave en la tarjeta
+    const card = document.querySelector(".contact-3d-card");
+    const container = document.querySelector(".contact-wrapper");
+
+    if (card && container) {
+      const handleMouseMove = (e) => {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -4;
+        const rotateY = ((x - centerX) / centerX) * 4;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      };
+
+      const handleMouseLeave = () => {
+        card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+      };
+
+      container.addEventListener("mousemove", handleMouseMove);
+      container.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    // 2. Función para copiar email al portapapeles con feedback visual
+    const copyBtn = document.getElementById("copy-email-btn");
+    const copyText = document.getElementById("copy-text");
+    const copyToast = document.getElementById("copy-toast");
+    const emailToCopy = "carlosgaubertquijada@gmail.com";
+
+    if (copyBtn && copyText) {
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(emailToCopy);
+
+          copyText.textContent = "¡Copiado!";
+          copyBtn.classList.add("border-emerald-500", "text-emerald-400");
+
+          if (copyToast) {
+            copyToast.classList.remove("translate-y-20", "opacity-0");
+            copyToast.classList.add("translate-y-0", "opacity-100");
+
+            setTimeout(() => {
+              copyToast.classList.remove("translate-y-0", "opacity-100");
+              copyToast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+          }
+
+          setTimeout(() => {
+            copyText.textContent = "Copiar email";
+            copyBtn.classList.remove("border-emerald-500", "text-emerald-400");
+          }, 2500);
+        } catch (err) {
+          console.error("Error al copiar al portapapeles:", err);
+        }
+      });
+    }
+
+    // 3. Manejo del formulario de contacto rápido
+    const form = document.getElementById("quick-contact-form");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("contact-name")?.value || "";
+        const subject = document.getElementById("contact-subject")?.value || "";
+        const message = document.getElementById("contact-message")?.value || "";
+
+        const fullSubject = encodeURIComponent(`[Portafolio] ${subject} - ${name}`);
+        const fullBody = encodeURIComponent(`Hola Carlos,\n\nMi nombre es ${name}.\n\n${message}`);
+
+        window.location.href = `mailto:carlosgaubertquijada@gmail.com?subject=${fullSubject}&body=${fullBody}`;
+      });
+    }
+  }
+
+  // Inicializar en cada carga de página con View Transitions
+  document.addEventListener("astro:page-load", setupContactPage);
+</script>
+
+<style>
+  .contact-3d-card {
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+    will-change: transform;
+  }
+</style>
+

@@ -1,66 +1,7 @@
-export const repositories = [
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/pytorch.png",
-    nameProject: "Clasificación de imágenes VIT.",
-    descriptionProject:
-      "Sistema que permite ver el comportamiento de una zona geografica y calcula el porcentaje de bosque en esta. Esta desarrollado con Python usando Django y utiliza Pytorch para los modelos de inteligencia artificial.",
-    githubUrl: "https://github.com/CarlosGaubert/TesisGaubertMapas",
-    tags: ["Python", "Django", "PyTorch"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/javaandroid.jpeg",
-    nameProject: "órdenes de trabajo.",
-    descriptionProject:
-      "Sistema de gestión de órdenes de trabajo para la gestión de proyectos. Desarrollado en android utilizando java y REST API usando retrofit.",
-    githubUrl: "https://github.com/CarlosGaubert/Ordenes-de-Trabajo-2017",
-    tags: ["Android", "Java"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/astro.webp",
-    nameProject: "Portafolio Carlos Gaubert.",
-    descriptionProject:
-      "Portafolio de proyectos de Carlos Gaubert. Desarrollado con astro y tailwindcss.",
-    githubUrl: "https://github.com/CarlosGaubert/portafolio-carlos-astro",
-    tags: ["Astro", "TailwindCSS"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/React.png",
-    nameProject: "Sistema de camiones (Frontend).",
-    descriptionProject:
-      "Sistema de gestión de camiones. Este sistema fue desarrollado para reemplazar sistema obsoleto. Desarrollado en ReactJS utilizando material UI.",
-    githubUrl: "https://github.com/CarlosGaubert/CamionesUBB",
-    tags: ["React"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/node.png",
-    nameProject: "Sistema de camiones (Backend).",
-    descriptionProject:
-      "Sistema de gestión de camiones. Este sistema fue desarrollado para reemplazar sistema obsoleto. Desarrollado en NodeJs. Sequelize como ORM.",
-    githubUrl: "https://github.com/CarlosGaubert/ServidorCamionesUBB/",
-    tags: ["Node.js", "Sequelize"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/opencv.png",
-    nameProject: "Calibración imagenes satelitales.",
-    descriptionProject:
-      "Algoritmo de calibración de imagenes satelitales, permite ver comportamiento de modelos VIT. Desarrollado en Python utilizando OpenCV.",
-    githubUrl: "https://github.com/CarlosGaubert/calibracion-image-satellite",
-    tags: ["Python", "OpenCV"],
-  },
-  {
-    patchImage: "/portafolio-carlos-astro/repositories/pytorch.png",
-    nameProject: "Modelos satelitales.",
-    descriptionProject:
-      "Sistema de entrenamiento de modelos satelitales. Desarrollado en Python utilizando Pytorch.",
-    githubUrl: "https://github.com/CarlosGaubert/ExperimentoModelosSatellite",
-    tags: ["Python", "PyTorch"],
-  },
-];
-
 export function getTechIconUrl(tech: string): string {
-  const name = tech.toLowerCase().trim();
+  const name = (tech || "").toLowerCase().trim();
   
-  // Mapping to devicon paths
+  // Mapping to official devicon paths
   const mapping: Record<string, string> = {
     python: "python/python-original.svg",
     django: "django/django-plain.svg",
@@ -108,6 +49,8 @@ export function getTechIconUrl(tech: string): string {
     mongodb: "mongodb/mongodb-original.svg",
     mongo: "mongodb/mongodb-original.svg",
     firebase: "firebase/firebase-plain.svg",
+    shell: "bash/bash-original.svg",
+    bash: "bash/bash-original.svg",
   };
 
   const path = mapping[name] || `${name}/${name}-original.svg`;
@@ -118,35 +61,49 @@ export function getTechIconUrl(tech: string): string {
   return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${path}`;
 }
 
-export function getTagsForProject(language: string | null, repoName: string, description: string): string[] {
-  const tagsSet = new Set<string>();
-  
-  const name = (repoName || "").toLowerCase();
-  const desc = (description || "").toLowerCase();
-
-  // Add primary language
-  if (language) {
-    tagsSet.add(language);
+export function getTechGradient(tech: string): string {
+  const name = (tech || "").toLowerCase().trim();
+  switch (name) {
+    case "python":
+      return "from-blue-950/70 via-slate-900/80 to-yellow-950/30";
+    case "react":
+    case "reactjs":
+      return "from-cyan-950/80 via-zinc-900/80 to-blue-950/50";
+    case "astro":
+      return "from-purple-950/80 via-zinc-900/80 to-orange-950/40";
+    case "nodejs":
+    case "node.js":
+    case "node":
+      return "from-emerald-950/80 via-zinc-900/80 to-green-950/40";
+    case "typescript":
+      return "from-blue-950/80 via-zinc-900/80 to-indigo-950/50";
+    case "javascript":
+      return "from-yellow-950/70 via-zinc-900/80 to-amber-950/40";
+    case "java":
+    case "android":
+    case "kotlin":
+      return "from-amber-950/70 via-zinc-900/80 to-red-950/40";
+    case "pytorch":
+    case "django":
+      return "from-red-950/70 via-zinc-900/80 to-orange-950/40";
+    case "opencv":
+      return "from-emerald-950/70 via-zinc-900/80 to-blue-950/50";
+    default:
+      return "from-zinc-900/90 via-zinc-950/90 to-zinc-900/90";
   }
-
-  // Inferred tags
-  if (name.includes("react") || desc.includes("react")) tagsSet.add("React");
-  if (name.includes("node") || desc.includes("node") || desc.includes("express")) tagsSet.add("Node.js");
-  if (name.includes("astro") || desc.includes("astro")) tagsSet.add("Astro");
-  if (name.includes("android") || desc.includes("android")) {
-    tagsSet.add("Android");
-    tagsSet.add("Java");
-  }
-  if (name.includes("pytorch") || desc.includes("pytorch")) tagsSet.add("PyTorch");
-  if (name.includes("django") || desc.includes("django")) tagsSet.add("Django");
-  if (name.includes("opencv") || desc.includes("opencv")) tagsSet.add("OpenCV");
-  if (name.includes("tailwind") || desc.includes("tailwind")) tagsSet.add("TailwindCSS");
-  if (name.includes("nextjs") || name.includes("next.js") || desc.includes("nextjs") || desc.includes("next.js")) tagsSet.add("Next.js");
-  if (name.includes("vue") || desc.includes("vue")) tagsSet.add("Vue.js");
-  if (name.includes("docker") || desc.includes("docker")) tagsSet.add("Docker");
-  if (name.includes("sequelize") || desc.includes("sequelize")) tagsSet.add("Sequelize");
-
-  return Array.from(tagsSet);
 }
 
-
+export function getMainLanguage(language: string | null, repoName: string = "", description: string = ""): string {
+  if (language && language.trim().length > 0) {
+    return language.trim();
+  }
+  const name = (repoName || "").toLowerCase();
+  const desc = (description || "").toLowerCase();
+  if (name.includes("python") || desc.includes("python")) return "Python";
+  if (name.includes("react") || desc.includes("react")) return "JavaScript";
+  if (name.includes("astro") || desc.includes("astro")) return "Astro";
+  if (name.includes("android") || desc.includes("android")) return "Java";
+  if (name.includes("node") || desc.includes("node")) return "JavaScript";
+  if (name.includes("typescript") || name.includes("ts")) return "TypeScript";
+  return "General";
+}
