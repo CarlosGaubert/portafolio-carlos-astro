@@ -1,5 +1,21 @@
 ---
 const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { name: "Inicio", href: "/portafolio-carlos-astro/" },
+  { name: "Proyectos", href: "/portafolio-carlos-astro/projects/" },
+  { name: "Experiencia", href: "/portafolio-carlos-astro/experience/" },
+  { name: "Contacto", href: "/portafolio-carlos-astro/contact/" },
+];
+
+function isPathActive(href: string) {
+  const cleanHref = href.replace(/\/+$/, "");
+  const cleanCurrent = currentPath.replace(/\/+$/, "");
+  if (cleanHref === "" || cleanHref === "/portafolio-carlos-astro") {
+    return cleanCurrent === "" || cleanCurrent === "/portafolio-carlos-astro";
+  }
+  return cleanCurrent.startsWith(cleanHref);
+}
 ---
 
 <nav
@@ -7,45 +23,67 @@ const currentPath = Astro.url.pathname;
   class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pt-4 px-4 pointer-events-none"
 >
   <div class="pointer-events-auto bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-xl rounded-full px-5 py-2.5 shadow-2xl flex items-center space-x-1 sm:space-x-3 text-sm font-medium">
-    <a
-      href="/portafolio-carlos-astro/"
-      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
-        currentPath === "/portafolio-carlos-astro/" || currentPath === "/portafolio-carlos-astro"
-          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-      }`}
-    >
-      Inicio
-    </a>
-    <a
-      href="/portafolio-carlos-astro/projects/"
-      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
-        currentPath.includes("/projects")
-          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-      }`}
-    >
-      Proyectos
-    </a>
-    <a
-      href="/portafolio-carlos-astro/experience/"
-      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
-        currentPath.includes("/experience")
-          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-      }`}
-    >
-      Experiencia
-    </a>
-    <a
-      href="/portafolio-carlos-astro/contact/"
-      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
-        currentPath.includes("/contact")
-          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-      }`}
-    >
-      Contacto
-    </a>
+    {
+      navItems.map((item) => {
+        const active = isPathActive(item.href);
+        return (
+          <a
+            href={item.href}
+            data-nav-link
+            data-href={item.href}
+            class={`nav-link px-3 py-1.5 rounded-full transition-all duration-300 border ${
+              active
+                ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
+                : "text-zinc-400 hover:text-white hover:bg-zinc-800/60 border-transparent"
+            }`}
+          >
+            {item.name}
+          </a>
+        );
+      })
+    }
   </div>
 </nav>
+
+<script>
+  const activeClasses = [
+    "bg-gradient-to-r",
+    "from-[#00ccff]/20",
+    "to-[#d500f9]/20",
+    "text-white",
+    "border-[#00ccff]/50",
+    "shadow-[0_0_12px_rgba(0,204,255,0.3)]",
+  ];
+
+  const inactiveClasses = [
+    "text-zinc-400",
+    "hover:text-white",
+    "hover:bg-zinc-800/60",
+    "border-transparent",
+  ];
+
+  function updateActiveNavLink() {
+    const current = window.location.pathname.replace(/\/+$/, "");
+    const links = document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]");
+
+    links.forEach((link) => {
+      const rawHref = link.getAttribute("data-href") || link.getAttribute("href") || "";
+      const cleanHref = rawHref.replace(/\/+$/, "");
+
+      const isHome = cleanHref === "" || cleanHref === "/portafolio-carlos-astro";
+      const isCurrentHome = current === "" || current === "/portafolio-carlos-astro";
+
+      const isActive = isHome ? isCurrentHome : current.startsWith(cleanHref);
+
+      if (isActive) {
+        link.classList.remove(...inactiveClasses);
+        link.classList.add(...activeClasses);
+      } else {
+        link.classList.remove(...activeClasses);
+        link.classList.add(...inactiveClasses);
+      }
+    });
+  }
+
+  document.addEventListener("astro:page-load", updateActiveNavLink);
+</script>
