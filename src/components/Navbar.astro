@@ -1,23 +1,51 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
 <nav
-  class="text-white p-7 z-50 h-0 flex absolute items-center justify-center w-full"
+  transition:persist
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pt-4 px-4 pointer-events-none"
 >
-  <div class="container mx-auto flex justify-center items-center">
-    <div class="flex items-center justify-center space-x-4">
-      <a
-        href="/portafolio-carlos-astro"
-        class="hover:text-gray-400 transition duration-300">Inicio</a
-      >
-      <a
-        href="/portafolio-carlos-astro/projects/"
-        class="hover:text-gray-400 transition duration-300">Proyectos</a
-      ><a
-        href="/portafolio-carlos-astro/experience/"
-        class="hover:text-gray-400 transition duration-300">Experiencia</a
-      >
-      <a
-        href="/portafolio-carlos-astro/contact/"
-        class="hover:text-gray-400 transition duration-300">Contacto</a
-      >
-    </div>
+  <div class="pointer-events-auto bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-xl rounded-full px-5 py-2.5 shadow-2xl flex items-center space-x-1 sm:space-x-3 text-sm font-medium">
+    <a
+      href="/portafolio-carlos-astro/"
+      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
+        currentPath === "/portafolio-carlos-astro/" || currentPath === "/portafolio-carlos-astro"
+          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+      }`}
+    >
+      Inicio
+    </a>
+    <a
+      href="/portafolio-carlos-astro/projects/"
+      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
+        currentPath.includes("/projects")
+          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+      }`}
+    >
+      Proyectos
+    </a>
+    <a
+      href="/portafolio-carlos-astro/experience/"
+      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
+        currentPath.includes("/experience")
+          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+      }`}
+    >
+      Experiencia
+    </a>
+    <a
+      href="/portafolio-carlos-astro/contact/"
+      class={`px-3 py-1.5 rounded-full transition-all duration-300 ${
+        currentPath.includes("/contact")
+          ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+      }`}
+    >
+      Contacto
+    </a>
   </div>
 </nav>

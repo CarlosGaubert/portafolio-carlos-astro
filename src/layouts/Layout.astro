@@ -37,46 +37,10 @@ const { title } = Astro.props;
         const feedback = document.querySelector(
           ".feedback",
         ) as HTMLElement | null;
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
         if (feedback) {
-          feedback.style.left = mouseX + "px";
-          feedback.style.top = mouseY + "px";
+          feedback.style.left = e.clientX + "px";
+          feedback.style.top = e.clientY + "px";
         }
-      });
-
-      // Persistir el estado de las animaciones de las estrellas de fondo
-      let starAnimationStates: { name: string; currentTime: CSSNumberish | null }[][] = [];
-
-      document.addEventListener("astro:before-swap", () => {
-        const stars = document.querySelectorAll(".star");
-        starAnimationStates = Array.from(stars).map((star) => {
-          return star.getAnimations().map((anim) => ({
-            name: "animationName" in anim ? (anim as any).animationName : "",
-            currentTime: anim.currentTime,
-          }));
-        });
-      });
-
-      document.addEventListener("astro:after-swap", () => {
-        const stars = document.querySelectorAll(".star");
-        stars.forEach((star, index) => {
-          const savedAnims = starAnimationStates[index];
-          if (!savedAnims) return;
-
-          // Esperamos al siguiente frame para asegurarnos de que el navegador
-          // haya re-inicializado las animaciones antes de restaurar su currentTime.
-          requestAnimationFrame(() => {
-            const currentAnims = star.getAnimations();
-            currentAnims.forEach((anim) => {
-              const animName = "animationName" in anim ? (anim as any).animationName : "";
-              const saved = savedAnims.find((sa) => sa.name === animName);
-              if (saved && saved.currentTime !== null) {
-                anim.currentTime = saved.currentTime;
-              }
-            });
-          });
-        });
       });
     </script>
     <div transition:persist class="feedback z-0"></div>

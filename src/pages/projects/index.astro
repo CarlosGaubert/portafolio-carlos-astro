@@ -586,30 +586,12 @@ const allLanguages = Array.from(
 </script>
 
 <style>
-  /* Inmovilizar completamente la cabecera y los controles */
+  /* Inmovilizar la cabecera y los controles de proyectos durante filtrado interno */
   header,
   header *,
   .controls-section,
   .controls-section * {
     view-transition-name: none !important;
-  }
-
-  /* Desactivar cualquier animación en root para que no parpadee ni se mueva la cabecera */
-  ::view-transition-group(root),
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none !important;
-  }
-
-  /* Transición fluida únicamente en las tarjetas */
-  ::view-transition-group(*:not(root)) {
-    animation-duration: 0.35s;
-    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  ::view-transition-old(*:not(root)),
-  ::view-transition-new(*:not(root)) {
-    animation-duration: 0.25s;
   }
 
   /* Botones de ordenamiento */
