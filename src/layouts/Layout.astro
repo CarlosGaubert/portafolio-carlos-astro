@@ -33,18 +33,52 @@ const { title } = Astro.props;
     </div>
 
     <slot />
-    <script>
-      // Efecto feedback del mouse
-      document.addEventListener("mousemove", function (e) {
-        const feedback = document.querySelector(
-          ".feedback",
-        ) as HTMLElement | null;
-        if (feedback) {
-          feedback.style.left = e.clientX + "px";
-          feedback.style.top = e.clientY + "px";
-        }
-      });
 
+    <!-- Luz / Spotlight Seguidor del Puntero en Viewport Fijo -->
+    <div id="cursor-glow" transition:persist="mouse-glow" class="cursor-glow" aria-hidden="true"></div>
+
+    <script is:inline>
+      (function () {
+        let mouseX = -1000;
+        let mouseY = -1000;
+        let currentX = -1000;
+        let currentY = -1000;
+        let isVisible = false;
+
+        function getGlowEl() {
+          return document.getElementById("cursor-glow");
+        }
+
+        window.addEventListener("mousemove", function (e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          const glow = getGlowEl();
+          if (!isVisible && glow) {
+            isVisible = true;
+            glow.style.opacity = "1";
+          }
+        });
+
+        document.addEventListener("mouseleave", function () {
+          isVisible = false;
+          const glow = getGlowEl();
+          if (glow) glow.style.opacity = "0";
+        });
+
+        function animateCursorGlow() {
+          const glow = getGlowEl();
+          if (glow && isVisible) {
+            currentX += (mouseX - currentX) * 0.18;
+            currentY += (mouseY - currentY) * 0.18;
+            glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+          }
+          requestAnimationFrame(animateCursorGlow);
+        }
+        requestAnimationFrame(animateCursorGlow);
+      })();
+    </script>
+
+    <script>
       // Preservar la continuidad fluida de las animaciones de las estrellas
       let starAnimationStates: { name: string; currentTime: CSSNumberish | null }[][] = [];
 
@@ -77,7 +111,6 @@ const { title } = Astro.props;
         });
       });
     </script>
-    <div transition:persist="mouse-feedback" class="feedback z-0"></div>
     <style is:global>
       #stars-container,
       #stars-container * {
@@ -198,16 +231,26 @@ const { title } = Astro.props;
         }
       }
 
-      .feedback {
-        position: absolute;
+      .cursor-glow {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 500px;
+        height: 500px;
         border-radius: 50%;
         pointer-events: none;
-        transform: translate(-50%, -50%);
-        transition:
-          transform 0.1s ease,
-          box-shadow 0.5s ease;
-        box-shadow: 0 0 400px 150px rgba(250, 250, 250, 0.1);
-        z-index: -1;
+        background: radial-gradient(
+          circle,
+          rgba(0, 204, 255, 0.12) 0%,
+          rgba(213, 0, 249, 0.06) 45%,
+          transparent 70%
+        );
+        transform: translate3d(-1000px, -1000px, 0) translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+        mix-blend-mode: screen;
+        will-change: transform, opacity;
       }
     </style>
   </body>
