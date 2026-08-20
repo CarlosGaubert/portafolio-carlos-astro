@@ -1,3 +1,55 @@
+export const defaultProjects = [
+  {
+    nameProject: "TesisGaubertMapas",
+    descriptionProject:
+      "Sistema que permite ver el comportamiento de una zona geográfica y calcula el porcentaje de bosque en esta. Desarrollado con Python usando Django y PyTorch para IA.",
+    githubUrl: "https://github.com/CarlosGaubert/TesisGaubertMapas",
+    language: "Python",
+  },
+  {
+    nameProject: "Ordenes-de-Trabajo-2017",
+    descriptionProject:
+      "Sistema de gestión de órdenes de trabajo para proyectos. Desarrollado en Android utilizando Java y REST API con Retrofit.",
+    githubUrl: "https://github.com/CarlosGaubert/Ordenes-de-Trabajo-2017",
+    language: "Java",
+  },
+  {
+    nameProject: "portafolio-carlos-astro",
+    descriptionProject:
+      "Portafolio profesional de Carlos Gaubert desarrollado con Astro, Tailwind CSS y View Transitions.",
+    githubUrl: "https://github.com/CarlosGaubert/portafolio-carlos-astro",
+    language: "Astro",
+  },
+  {
+    nameProject: "CamionesUBB",
+    descriptionProject:
+      "Sistema de gestión y seguimiento de camiones desarrollado en ReactJS con Material UI.",
+    githubUrl: "https://github.com/CarlosGaubert/CamionesUBB",
+    language: "JavaScript",
+  },
+  {
+    nameProject: "ServidorCamionesUBB",
+    descriptionProject:
+      "Servidor backend para el sistema de gestión de camiones. Desarrollado en Node.js con Sequelize ORM.",
+    githubUrl: "https://github.com/CarlosGaubert/ServidorCamionesUBB",
+    language: "JavaScript",
+  },
+  {
+    nameProject: "calibracion-image-satellite",
+    descriptionProject:
+      "Algoritmo de calibración de imágenes satelitales para modelos Vision Transformer (ViT). Desarrollado en Python con OpenCV.",
+    githubUrl: "https://github.com/CarlosGaubert/calibracion-image-satellite",
+    language: "Python",
+  },
+  {
+    nameProject: "ExperimentoModelosSatellite",
+    descriptionProject:
+      "Entrenamiento y evaluación de modelos satelitales avanzados en Python utilizando PyTorch.",
+    githubUrl: "https://github.com/CarlosGaubert/ExperimentoModelosSatellite",
+    language: "Python",
+  },
+];
+
 export function getTechIconUrl(tech: string): string {
   const name = (tech || "").toLowerCase().trim();
   

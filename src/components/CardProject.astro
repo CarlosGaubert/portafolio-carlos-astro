@@ -5,15 +5,17 @@ interface Props {
   githubUrl: string;
   language?: string;
   id?: string;
+  index?: number;
 }
 
-const { nameProject, descriptionProject, githubUrl, language = "General", id } = Astro.props;
+const { nameProject, descriptionProject, githubUrl, language = "General", id, index = 0 } = Astro.props;
 import { getTechIconUrl, getTechGradient } from "@/lib/dataProjects";
 
 const cardId = id || nameProject.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 const primaryLang = language || "General";
 const primaryIcon = getTechIconUrl(primaryLang);
 const gradientClass = getTechGradient(primaryLang);
+const delayMs = Math.min(index * 35, 350);
 ---
 
 <div
@@ -21,7 +23,7 @@ const gradientClass = getTechGradient(primaryLang);
   data-name={nameProject.toLowerCase()}
   data-tech={primaryLang.toLowerCase()}
   data-id={cardId}
-  style={`view-transition-name: card-${cardId};`}
+  style={`--card-delay: ${delayMs}ms;`}
 >
   <!-- Header / Banner de Tecnología Online -->
   <div class={`tech-banner w-full h-28 z-20 overflow-hidden rounded-t-[16px] relative bg-gradient-to-br ${gradientClass} flex items-center justify-between px-6 border-b border-zinc-800/80`}>
@@ -83,54 +85,29 @@ const gradientClass = getTechGradient(primaryLang);
   </div>
 </div>
 
-<style>
-  .box {
+<style is:global>
+  .project-card.box {
     position: relative;
     height: 290px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(20, 20, 24, 0.85);
+    border: 1px solid rgba(63, 63, 70, 0.5);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.15);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .box:hover {
+  .project-card.box:hover {
+    border-color: rgba(0, 204, 255, 0.5);
     box-shadow:
-      0 8px 16px rgba(255, 255, 255, 0.2),
-      0 12px 40px rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
-  }
-
-  .box::after {
-    content: "";
-    position: absolute;
-    background: rgb(25, 25, 25);
-    inset: 4px;
-    border-radius: 16px;
-    z-index: 1;
-  }
-
-  .box::before {
-    content: "";
-    position: absolute;
-    width: 140px;
-    height: 200%;
-    background: linear-gradient(#00ccff, #d500f9);
-    animation: rotate 4s linear infinite;
-    z-index: 0;
-  }
-
-  @keyframes rotate {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+      0 12px 30px -10px rgba(0, 204, 255, 0.25),
+      0 0 15px rgba(213, 0, 249, 0.15);
+    transform: translateY(-4px) scale(1.02);
   }
 
   .tech-banner {

@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import CardProject from "@/components/CardProject.astro";
-import { getTechIconUrl, getMainLanguage } from "@/lib/dataProjects";
+import { getTechIconUrl, getMainLanguage, defaultProjects } from "@/lib/dataProjects";
 import { slide } from "astro:transitions";
 
 let projects: any[] = [];
@@ -24,7 +24,12 @@ try {
     });
   }
 } catch (error) {
-  console.error("Error fetching GitHub repos:", error);
+  console.error("Error fetching GitHub repos during build:", error);
+}
+
+// Si la API de GitHub falló o tiene rate limit en GitHub Actions, usar lista representativa por defecto
+if (!projects || projects.length === 0) {
+  projects = defaultProjects;
 }
 
 // Extraer lista única de lenguajes de programación para los botones de filtrado
@@ -156,12 +161,13 @@ const allLanguages = Array.from(
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full justify-items-center"
     >
       {
-        projects.map((repo: any) => (
+        projects.map((repo: any, index: number) => (
           <CardProject
             nameProject={repo.nameProject}
             descriptionProject={repo.descriptionProject}
             githubUrl={repo.githubUrl}
             language={repo.language}
+            index={index}
           />
         ))
       }
@@ -186,6 +192,8 @@ const allLanguages = Array.from(
         Restablecer filtros
       </button>
     </div>
+    <!-- Script de datos iniciales para sincronización inmediata -->
+    <script id="initial-projects-data" is:inline type="application/json" set:html={JSON.stringify(projects)}></script>
   </main>
 </Layout>
 
@@ -194,9 +202,17 @@ const allLanguages = Array.from(
     const grid = document.getElementById("projects-grid");
     if (!grid) return;
 
-    let cards = Array.from(grid.querySelectorAll(".project-card"));
-    const sortButtons = document.querySelectorAll(".sort-btn");
-    let filterButtons = document.querySelectorAll(".filter-tag-btn");
+    const dataEl = document.getElementById("initial-projects-data");
+    let allProjects = [];
+    try {
+      if (dataEl && dataEl.textContent) {
+        allProjects = JSON.parse(dataEl.textContent);
+      }
+    } catch (e) {
+      console.error("Error parsing initial projects data:", e);
+    }
+
+    const controlsSection = document.querySelector(".controls-section");
     const searchInput = document.getElementById("search-input");
     const visibleCountEl = document.getElementById("visible-count");
     const totalCountEl = document.getElementById("total-count");
@@ -208,267 +224,181 @@ const allLanguages = Array.from(
     let currentFilter = "all";
     let currentSearch = "";
 
-    function sortCards(list, sortType) {
-      return [...list].sort((a, b) => {
-        const nameA = (a.getAttribute("data-name") || "").toLowerCase();
-        const nameB = (b.getAttribute("data-name") || "").toLowerCase();
-        const techA = (a.getAttribute("data-tech") || "").toLowerCase();
-        const techB = (b.getAttribute("data-tech") || "").toLowerCase();
+    // Mapeo unificado de iconos Devicon
+    function getTechIcon(t) {
+      const name = (t || "").toLowerCase().trim();
+      const map = {
+        python: "python/python-original.svg",
+        django: "django/django-plain.svg",
+        pytorch: "pytorch/pytorch-original.svg",
+        java: "java/java-original.svg",
+        android: "android/android-original.svg",
+        astro: "astro/astro-original.svg",
+        tailwindcss: "tailwindcss/tailwindcss-original.svg",
+        tailwind: "tailwindcss/tailwindcss-original.svg",
+        react: "react/react-original.svg",
+        reactjs: "react/react-original.svg",
+        nodejs: "nodejs/nodejs-original.svg",
+        "node.js": "nodejs/nodejs-original.svg",
+        node: "nodejs/nodejs-original.svg",
+        sequelize: "sequelize/sequelize-original.svg",
+        opencv: "opencv/opencv-original.svg",
+        javascript: "javascript/javascript-original.svg",
+        typescript: "typescript/typescript-original.svg",
+        html: "html5/html5-original.svg",
+        html5: "html5/html5-original.svg",
+        css: "css3/css3-original.svg",
+        css3: "css3/css3-original.svg",
+        docker: "docker/docker-original.svg",
+        csharp: "csharp/csharp-original.svg",
+        "c#": "csharp/csharp-original.svg",
+        cplusplus: "cplusplus/cplusplus-original.svg",
+        "c++": "cplusplus/cplusplus-original.svg",
+        c: "c/c-original.svg",
+        go: "go/go-original.svg",
+        rust: "rust/rust-original.svg",
+        php: "php/php-original.svg",
+        ruby: "ruby/ruby-original.svg",
+        swift: "swift/swift-original.svg",
+        kotlin: "kotlin/kotlin-original.svg",
+        vue: "vuejs/vuejs-original.svg",
+        "vue.js": "vuejs/vuejs-original.svg",
+        nextjs: "nextjs/nextjs-original.svg",
+        "next.js": "nextjs/nextjs-original.svg",
+        shell: "bash/bash-original.svg",
+        bash: "bash/bash-original.svg"
+      };
+      const p = map[name] || `${name}/${name}-original.svg`;
+      return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${p}`;
+    }
 
-        if (sortType === "name-asc") {
-          return nameA.localeCompare(nameB);
-        } else if (sortType === "name-desc") {
-          return nameB.localeCompare(nameA);
-        } else if (sortType === "tech-asc") {
-          const techCompare = techA.localeCompare(techB);
-          return techCompare !== 0 ? techCompare : nameA.localeCompare(nameB);
+    // Gradientes temáticos según tecnología
+    function getGradient(tech) {
+      const n = (tech || "").toLowerCase().trim();
+      if (n === "python") return "from-blue-950/70 via-slate-900/80 to-yellow-950/30";
+      if (n === "react" || n === "reactjs") return "from-cyan-950/80 via-zinc-900/80 to-blue-950/50";
+      if (n === "astro") return "from-purple-950/80 via-zinc-900/80 to-orange-950/40";
+      if (n === "nodejs" || n === "node.js" || n === "node") return "from-emerald-950/80 via-zinc-900/80 to-green-950/40";
+      if (n === "typescript") return "from-blue-950/80 via-zinc-900/80 to-indigo-950/50";
+      if (n === "javascript") return "from-yellow-950/70 via-zinc-900/80 to-amber-950/40";
+      if (n === "java" || n === "android" || n === "kotlin") return "from-amber-950/70 via-zinc-900/80 to-red-950/40";
+      if (n === "pytorch" || n === "django") return "from-red-950/70 via-zinc-900/80 to-orange-950/40";
+      if (n === "opencv") return "from-emerald-950/70 via-zinc-900/80 to-blue-950/50";
+      return "from-zinc-900/90 via-zinc-950/90 to-zinc-900/90";
+    }
+
+    function extractMainLang(lang, name, desc) {
+      if (lang && lang.trim().length > 0) return lang.trim();
+      const n = (name || "").toLowerCase();
+      const d = (desc || "").toLowerCase();
+      if (n.includes("python") || d.includes("python")) return "Python";
+      if (n.includes("react") || d.includes("react")) return "JavaScript";
+      if (n.includes("astro") || d.includes("astro")) return "Astro";
+      if (n.includes("android") || d.includes("android")) return "Java";
+      if (n.includes("node") || d.includes("node")) return "JavaScript";
+      if (n.includes("typescript") || n.includes("ts")) return "TypeScript";
+      return "General";
+    }
+
+    function renderFilterButtons() {
+      const filterContainer = document.getElementById("filter-tags-container");
+      if (!filterContainer) return;
+
+      const langs = Array.from(
+        new Set(allProjects.map((p) => p.language).filter(Boolean))
+      ).sort((a, b) => a.localeCompare(b));
+
+      let html = `
+        <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex-shrink-0">Filtrar por Lenguaje:</span>
+        <button
+          type="button"
+          class="filter-tag-btn ${currentFilter === "all" ? "active-filter" : ""} px-3 py-1 text-xs rounded-full border transition-colors flex-shrink-0 cursor-pointer"
+          data-filter="all"
+        >
+          Todos (${allProjects.length})
+        </button>
+      `;
+
+      langs.forEach((lang) => {
+        const isActive = currentFilter.toLowerCase() === lang.toLowerCase();
+        const count = allProjects.filter(
+          (p) => (p.language || "").toLowerCase() === lang.toLowerCase()
+        ).length;
+
+        html += `
+          <button
+            type="button"
+            class="filter-tag-btn ${isActive ? "active-filter" : ""} px-3 py-1 text-xs rounded-full border transition-colors flex-shrink-0 flex items-center gap-1.5 cursor-pointer"
+            data-filter="${lang.toLowerCase()}"
+          >
+            <img
+              src="${getTechIcon(lang)}"
+              alt=""
+              class="w-3 h-3 object-contain"
+              onerror="this.style.display='none'"
+            />
+            <span>${lang} (${count})</span>
+          </button>
+        `;
+      });
+
+      filterContainer.innerHTML = html;
+    }
+
+    function renderProjects() {
+      // 1. Filtrar
+      const searchTerms = currentSearch.toLowerCase().trim();
+      const filtered = allProjects.filter((p) => {
+        const tech = (p.language || "General").toLowerCase();
+        const matchesFilter =
+          currentFilter === "all" ||
+          tech === currentFilter.toLowerCase();
+
+        const name = (p.nameProject || "").toLowerCase();
+        const desc = (p.descriptionProject || "").toLowerCase();
+        const matchesSearch =
+          !searchTerms ||
+          name.includes(searchTerms) ||
+          tech.includes(searchTerms) ||
+          desc.includes(searchTerms);
+
+        return matchesFilter && matchesSearch;
+      });
+
+      // 2. Ordenar
+      filtered.sort((a, b) => {
+        const nameA = (a.nameProject || "").toLowerCase();
+        const nameB = (b.nameProject || "").toLowerCase();
+        const techA = (a.language || "").toLowerCase();
+        const techB = (b.language || "").toLowerCase();
+
+        if (currentSort === "name-asc") return nameA.localeCompare(nameB);
+        if (currentSort === "name-desc") return nameB.localeCompare(nameA);
+        if (currentSort === "tech-asc") {
+          const c = techA.localeCompare(techB);
+          return c !== 0 ? c : nameA.localeCompare(nameB);
         }
         return 0;
       });
-    }
 
-    function updateView(withTransition = true) {
-      const executeDOMUpdate = () => {
-        // Ordenar tarjetas
-        const sorted = sortCards(cards, currentSort);
-
-        let visibleCount = 0;
-        const searchTerms = currentSearch.toLowerCase().trim();
-
-        sorted.forEach((card) => {
-          const name = (card.getAttribute("data-name") || "").toLowerCase();
-          const tech = (card.getAttribute("data-tech") || "").toLowerCase();
-          const cardText = card.textContent?.toLowerCase() || "";
-
-          // Comprobar filtro únicamente por lenguaje principal
-          const matchesFilter =
-            currentFilter === "all" ||
-            tech === currentFilter;
-
-          // Comprobar búsqueda por texto
-          const matchesSearch =
-            !searchTerms ||
-            name.includes(searchTerms) ||
-            tech.includes(searchTerms) ||
-            cardText.includes(searchTerms);
-
-          const isVisible = matchesFilter && matchesSearch;
-
-          if (isVisible) {
-            card.style.display = "";
-            visibleCount++;
-          } else {
-            card.style.display = "none";
-          }
-
-          // Re-insertar en el grid en el orden correspondiente
-          grid.appendChild(card);
-        });
-
-        // Actualizar contadores
-        if (visibleCountEl) {
-          visibleCountEl.textContent = String(visibleCount);
-        }
-
-        if (noResultsEl) {
-          if (visibleCount === 0) {
-            noResultsEl.classList.remove("hidden");
-            noResultsEl.classList.add("flex");
-          } else {
-            noResultsEl.classList.add("hidden");
-            noResultsEl.classList.remove("flex");
-          }
-        }
-      };
-
-      const mainEl = document.querySelector("main");
-
-      // Ejecutar View Transitions únicamente en las tarjetas si withTransition es true
-      if (withTransition && document.startViewTransition) {
-        if (mainEl) mainEl.style.viewTransitionName = "none";
-
-        const transition = document.startViewTransition(() => {
-          executeDOMUpdate();
-        });
-
-        transition.finished.finally(() => {
-          if (mainEl) mainEl.style.viewTransitionName = "";
-        });
-      } else {
-        executeDOMUpdate();
-      }
-    }
-
-    function bindFilterEvents() {
-      filterButtons = document.querySelectorAll(".filter-tag-btn");
-      filterButtons.forEach((btn) => {
-        btn.onclick = () => {
-          const filterVal = btn.getAttribute("data-filter");
-          if (!filterVal) return;
-          currentFilter = filterVal;
-
-          filterButtons.forEach((b) => {
-            b.classList.remove("active-filter");
-          });
-          btn.classList.add("active-filter");
-
-          updateView(true);
-        };
-      });
-    }
-
-    // Eventos para botones de ordenamiento
-    sortButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const sortType = btn.getAttribute("data-sort");
-        if (!sortType) return;
-        currentSort = sortType;
-
-        sortButtons.forEach((b) => {
-          b.classList.remove("active-sort");
-        });
-        btn.classList.add("active-sort");
-
-        if (sortStatusEl) {
-          if (sortType === "name-asc") sortStatusEl.textContent = "Orden: Nombre (A-Z)";
-          else if (sortType === "name-desc") sortStatusEl.textContent = "Orden: Nombre (Z-A)";
-          else if (sortType === "tech-asc") sortStatusEl.textContent = "Orden: Lenguaje (A-Z)";
-        }
-
-        updateView(true);
-      });
-    });
-
-    // Eventos para botones de filtro
-    bindFilterEvents();
-
-    // Evento para el buscador: filtrado en vivo instantáneo sin animación de página
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        currentSearch = e.target.value;
-        updateView(false);
-      });
-    }
-
-    // Botón de restablecer
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        currentFilter = "all";
-        currentSearch = "";
-        if (searchInput) searchInput.value = "";
-
-        filterButtons.forEach((b) => {
-          b.classList.toggle("active-filter", b.getAttribute("data-filter") === "all");
-        });
-
-        updateView(true);
-      });
-    }
-
-    // Sincronización en vivo directamente desde la API de GitHub en el cliente
-    async function syncLiveFromGitHub() {
-      try {
-        const res = await fetch("https://api.github.com/users/CarlosGaubert/repos?sort=updated&per_page=100");
-        if (!res.ok) return;
-        const repos = await res.json();
-        if (!Array.isArray(repos) || repos.length === 0) return;
-
-        const nonForkRepos = repos.filter((r) => !r.fork);
-        if (nonForkRepos.length === 0) return;
-
-        // Helper para gradientes de lenguaje
-        function getGradient(tech) {
-          const n = (tech || "").toLowerCase().trim();
-          if (n === "python") return "from-blue-950/70 via-slate-900/80 to-yellow-950/30";
-          if (n === "react" || n === "reactjs") return "from-cyan-950/80 via-zinc-900/80 to-blue-950/50";
-          if (n === "astro") return "from-purple-950/80 via-zinc-900/80 to-orange-950/40";
-          if (n === "nodejs" || n === "node.js" || n === "node") return "from-emerald-950/80 via-zinc-900/80 to-green-950/40";
-          if (n === "typescript") return "from-blue-950/80 via-zinc-900/80 to-indigo-950/50";
-          if (n === "javascript") return "from-yellow-950/70 via-zinc-900/80 to-amber-950/40";
-          if (n === "java" || n === "android" || n === "kotlin") return "from-amber-950/70 via-zinc-900/80 to-red-950/40";
-          if (n === "pytorch" || n === "django") return "from-red-950/70 via-zinc-900/80 to-orange-950/40";
-          if (n === "opencv") return "from-emerald-950/70 via-zinc-900/80 to-blue-950/50";
-          return "from-zinc-900/90 via-zinc-950/90 to-zinc-900/90";
-        }
-
-        // Helper para iconos de lenguaje online (Devicon CDN)
-        function getTechIcon(t) {
-          const name = (t || "").toLowerCase().trim();
-          const map = {
-            python: "python/python-original.svg",
-            django: "django/django-plain.svg",
-            pytorch: "pytorch/pytorch-original.svg",
-            java: "java/java-original.svg",
-            android: "android/android-original.svg",
-            astro: "astro/astro-original.svg",
-            tailwindcss: "tailwindcss/tailwindcss-original.svg",
-            tailwind: "tailwindcss/tailwindcss-original.svg",
-            react: "react/react-original.svg",
-            reactjs: "react/react-original.svg",
-            nodejs: "nodejs/nodejs-original.svg",
-            "node.js": "nodejs/nodejs-original.svg",
-            node: "nodejs/nodejs-original.svg",
-            sequelize: "sequelize/sequelize-original.svg",
-            opencv: "opencv/opencv-original.svg",
-            javascript: "javascript/javascript-original.svg",
-            typescript: "typescript/typescript-original.svg",
-            html: "html5/html5-original.svg",
-            html5: "html5/html5-original.svg",
-            css: "css3/css3-original.svg",
-            css3: "css3/css3-original.svg",
-            docker: "docker/docker-original.svg",
-            csharp: "csharp/csharp-original.svg",
-            "c#": "csharp/csharp-original.svg",
-            cplusplus: "cplusplus/cplusplus-original.svg",
-            "c++": "cplusplus/cplusplus-original.svg",
-            c: "c/c-original.svg",
-            go: "go/go-original.svg",
-            rust: "rust/rust-original.svg",
-            php: "php/php-original.svg",
-            ruby: "ruby/ruby-original.svg",
-            swift: "swift/swift-original.svg",
-            kotlin: "kotlin/kotlin-original.svg",
-            vue: "vuejs/vuejs-original.svg",
-            "vue.js": "vuejs/vuejs-original.svg",
-            nextjs: "nextjs/nextjs-original.svg",
-            "next.js": "nextjs/nextjs-original.svg",
-            shell: "bash/bash-original.svg",
-            bash: "bash/bash-original.svg"
-          };
-          const p = map[name] || `${name}/${name}-original.svg`;
-          return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${p}`;
-        }
-
-        function extractMainLang(lang, name, desc) {
-          if (lang && lang.trim().length > 0) return lang.trim();
-          const n = (name || "").toLowerCase();
-          const d = (desc || "").toLowerCase();
-          if (n.includes("python") || d.includes("python")) return "Python";
-          if (n.includes("react") || d.includes("react")) return "JavaScript";
-          if (n.includes("astro") || d.includes("astro")) return "Astro";
-          if (n.includes("android") || d.includes("android")) return "Java";
-          if (n.includes("node") || d.includes("node")) return "JavaScript";
-          if (n.includes("typescript") || n.includes("ts")) return "TypeScript";
-          return "General";
-        }
-
-        const newCardsHtml = nonForkRepos.map((repo) => {
-          const name = repo.name;
-          const desc = repo.description || "Sin descripción disponible.";
-          const primaryLang = extractMainLang(repo.language, repo.name, desc);
-          const cardId = name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+      // 3. Renderizar Tarjetas con animación escalonada
+      grid.innerHTML = filtered
+        .map((repo, index) => {
+          const name = repo.nameProject;
+          const desc = repo.descriptionProject || "Sin descripción disponible.";
+          const primaryLang = repo.language || "General";
           const primaryIconUrl = getTechIcon(primaryLang);
           const gradientClass = getGradient(primaryLang);
+          const delayMs = Math.min(index * 35, 350);
 
           return `
             <div
               class="project-card box place-self-center grid-item w-full max-w-[400px]"
               data-name="${name.toLowerCase()}"
               data-tech="${primaryLang.toLowerCase()}"
-              data-id="${cardId}"
-              style="view-transition-name: card-${cardId};"
+              style="--card-delay: ${delayMs}ms;"
             >
-              <!-- Header / Banner de Tecnología Online -->
+              <!-- Header / Banner de Tecnología -->
               <div class="tech-banner w-full h-28 z-20 overflow-hidden rounded-t-[16px] relative bg-gradient-to-br ${gradientClass} flex items-center justify-between px-6 border-b border-zinc-800/80">
                 <div class="flex items-center gap-3.5 z-10">
                   <div class="w-12 h-12 rounded-xl bg-zinc-950/80 border border-white/10 p-2 flex items-center justify-center shadow-lg backdrop-blur-md">
@@ -501,19 +431,22 @@ const allLanguages = Array.from(
                     ${name}
                   </h3>
 
-                  <a
-                    href="${repo.html_url}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="github-icon flex-shrink-0 flex items-center justify-center p-2 rounded-xl bg-zinc-800/90 hover:bg-[#00ccff]/20 border border-zinc-600 hover:border-[#00ccff] text-white hover:text-[#00ccff] transition-all duration-300 transform hover:scale-110 shadow-md"
-                    title="Ver repositorio en GitHub"
-                    aria-label="Ver repositorio de ${name} en GitHub"
-                  >
-                    <!-- SVG Blanco Nítido de GitHub -->
-                    <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
-                    </svg>
-                  </a>
+                  ${
+                    repo.githubUrl
+                      ? `<a
+                          href="${repo.githubUrl}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="github-icon flex-shrink-0 flex items-center justify-center p-2 rounded-xl bg-zinc-800/90 hover:bg-[#00ccff]/20 border border-zinc-600 hover:border-[#00ccff] text-white hover:text-[#00ccff] transition-all duration-300 transform hover:scale-110 shadow-md"
+                          title="Ver repositorio en GitHub"
+                          aria-label="Ver repositorio de ${name} en GitHub"
+                        >
+                          <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+                          </svg>
+                        </a>`
+                      : ""
+                  }
                 </div>
 
                 <p
@@ -525,73 +458,157 @@ const allLanguages = Array.from(
               </div>
             </div>
           `;
-        }).join("");
+        })
+        .join("");
 
-        // Extraer únicamente los lenguajes únicos encontrados
-        const allLangs = Array.from(
-          new Set(
-            nonForkRepos.map((repo) =>
-              extractMainLang(repo.language, repo.name, repo.description)
-            )
-          )
-        ).filter(Boolean).sort((a, b) => a.localeCompare(b));
+      // 4. Actualizar Contadores y Estados
+      if (visibleCountEl) {
+        visibleCountEl.textContent = String(filtered.length);
+        visibleCountEl.style.transform = "scale(1.25)";
+        setTimeout(() => {
+          if (visibleCountEl) visibleCountEl.style.transform = "scale(1)";
+        }, 180);
+      }
+      if (totalCountEl) totalCountEl.textContent = String(allProjects.length);
 
-        const filterContainer = document.getElementById("filter-tags-container");
-        if (filterContainer) {
-          filterContainer.innerHTML = `
-            <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex-shrink-0">Filtrar por Lenguaje:</span>
-            <button
-              type="button"
-              class="filter-tag-btn ${currentFilter === "all" ? "active-filter" : ""} px-3 py-1 text-xs rounded-full border transition-colors flex-shrink-0"
-              data-filter="all"
-            >
-              Todos (${nonForkRepos.length})
-            </button>
-            ${allLangs.map((lang) => `
-              <button
-                type="button"
-                class="filter-tag-btn ${currentFilter === lang.toLowerCase() ? "active-filter" : ""} px-3 py-1 text-xs rounded-full border transition-colors flex-shrink-0 flex items-center gap-1.5"
-                data-filter="${lang.toLowerCase()}"
-              >
-                <img
-                  src="${getTechIcon(lang)}"
-                  alt=""
-                  class="w-3 h-3 object-contain"
-                  onerror="this.style.display='none'"
-                />
-                <span>${lang}</span>
-              </button>
-            `).join("")}
-          `;
-          bindFilterEvents();
+      if (noResultsEl) {
+        if (filtered.length === 0) {
+          noResultsEl.classList.remove("hidden");
+          noResultsEl.classList.add("flex");
+        } else {
+          noResultsEl.classList.add("hidden");
+          noResultsEl.classList.remove("flex");
+        }
+      }
+    }
+
+    // Manejo de eventos centralizado por delegación en controlsSection
+    if (controlsSection) {
+      controlsSection.onclick = (e) => {
+        const target = e.target;
+
+        // Clic en botón de filtro
+        const filterBtn = target.closest(".filter-tag-btn");
+        if (filterBtn) {
+          const filter = filterBtn.getAttribute("data-filter");
+          if (filter) {
+            currentFilter = filter;
+            renderFilterButtons();
+            renderProjects();
+          }
+          return;
         }
 
-        grid.innerHTML = newCardsHtml;
-        cards = Array.from(grid.querySelectorAll(".project-card"));
-        if (totalCountEl) totalCountEl.textContent = String(cards.length);
-        updateView(false);
+        // Clic en botón de ordenamiento
+        const sortBtn = target.closest(".sort-btn");
+        if (sortBtn) {
+          const sort = sortBtn.getAttribute("data-sort");
+          if (sort) {
+            currentSort = sort;
+
+            const allSortBtns = controlsSection.querySelectorAll(".sort-btn");
+            allSortBtns.forEach((b) => b.classList.remove("active-sort"));
+            sortBtn.classList.add("active-sort");
+
+            if (sortStatusEl) {
+              if (sort === "name-asc") sortStatusEl.textContent = "Orden: Nombre (A-Z)";
+              else if (sort === "name-desc") sortStatusEl.textContent = "Orden: Nombre (Z-A)";
+              else if (sort === "tech-asc") sortStatusEl.textContent = "Orden: Lenguaje (A-Z)";
+            }
+
+            renderProjects();
+          }
+          return;
+        }
+      };
+    }
+
+    // Buscador interactivo
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        currentSearch = e.target.value;
+        renderProjects();
+      };
+    }
+
+    // Botón de restablecer
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        currentFilter = "all";
+        currentSearch = "";
+        if (searchInput) searchInput.value = "";
+        renderFilterButtons();
+        renderProjects();
+      };
+    }
+
+    // Sincronización en vivo con la API de GitHub
+    async function syncLiveFromGitHub() {
+      try {
+        const res = await fetch("https://api.github.com/users/CarlosGaubert/repos?sort=updated&per_page=100");
+        if (!res.ok) return;
+        const repos = await res.json();
+        if (!Array.isArray(repos) || repos.length === 0) return;
+
+        const nonForkRepos = repos.filter((r) => !r.fork);
+        if (nonForkRepos.length === 0) return;
+
+        allProjects = nonForkRepos.map((repo) => {
+          const desc = repo.description || "Sin descripción disponible.";
+          return {
+            nameProject: repo.name,
+            descriptionProject: desc,
+            githubUrl: repo.html_url,
+            language: extractMainLang(repo.language, repo.name, desc)
+          };
+        });
 
         const badge = document.getElementById("github-sync-badge");
-        if (badge) badge.textContent = `GitHub en Vivo (${nonForkRepos.length} repositorios)`;
+        if (badge) badge.textContent = `GitHub en Vivo (${allProjects.length} repositorios)`;
+
+        renderFilterButtons();
+        renderProjects();
       } catch (e) {
         console.error("Error sincronizando repositorios desde GitHub:", e);
       }
     }
 
+    renderFilterButtons();
+    renderProjects();
     syncLiveFromGitHub();
   }
 
-  // Inicialización con soporte para transiciones de página de Astro
+  // Inicialización con soporte total para View Transitions de Astro
   document.addEventListener("astro:page-load", setupProjectControls);
 </script>
 
-<style>
-  /* Inmovilizar la cabecera y los controles de proyectos durante filtrado interno */
-  header,
-  header *,
-  .controls-section,
-  .controls-section * {
-    view-transition-name: none !important;
+<style is:global>
+  /* Animación de entrada suave y escalonada para las tarjetas filtradas */
+  @keyframes cardFilterEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(22px) scale(0.95);
+    }
+    60% {
+      opacity: 0.85;
+      transform: translateY(-2px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .project-card {
+    animation: cardFilterEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--card-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  /* Contador animado */
+  #visible-count {
+    display: inline-block;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   /* Botones de ordenamiento */
@@ -599,12 +616,14 @@ const allLanguages = Array.from(
     background: rgba(24, 24, 27, 0.8);
     border-color: rgba(63, 63, 70, 0.6);
     color: #a1a1aa;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .sort-btn:hover {
     border-color: rgba(0, 204, 255, 0.6);
     color: #ffffff;
     background: rgba(39, 39, 42, 0.9);
+    transform: translateY(-1px);
   }
 
   .sort-btn.active-sort {
@@ -612,6 +631,7 @@ const allLanguages = Array.from(
     border-color: #00ccff;
     color: #ffffff;
     box-shadow: 0 0 12px rgba(0, 204, 255, 0.3);
+    transform: translateY(-1px);
   }
 
   /* Botones de filtro de lenguaje */
@@ -619,12 +639,14 @@ const allLanguages = Array.from(
     background: rgba(24, 24, 27, 0.7);
     border-color: rgba(63, 63, 70, 0.5);
     color: #a1a1aa;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .filter-tag-btn:hover {
     border-color: rgba(213, 0, 249, 0.6);
     color: #ffffff;
     background: rgba(39, 39, 42, 0.9);
+    transform: translateY(-2px);
   }
 
   .filter-tag-btn.active-filter {
@@ -633,6 +655,7 @@ const allLanguages = Array.from(
     color: #ffffff;
     font-weight: 600;
     box-shadow: 0 0 15px rgba(213, 0, 249, 0.4);
+    transform: translateY(-2px) scale(1.04);
   }
 </style>
 
