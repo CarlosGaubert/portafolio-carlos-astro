@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import CardProject from "@/components/CardProject.astro";
+import GithubContributions from "@/components/GithubContributions.astro";
 import { getTechIconUrl, getMainLanguage, defaultProjects } from "@/lib/dataProjects";
 import { slide } from "astro:transitions";
 
@@ -59,6 +60,9 @@ const allLanguages = Array.from(
         Explora mis repositorios y proyectos sincronizados directamente desde mi GitHub oficial. Puedes ordenar y filtrar interactivamente.
       </p>
     </header>
+
+    <!-- Calendario de Contribuciones de GitHub en Tiempo Real -->
+    <GithubContributions username="CarlosGaubert" />
 
     <!-- Barra de Controles: Ordenamiento, Filtros y Búsqueda -->
     <section class="controls-section w-full mb-10 bg-zinc-950/60 border border-zinc-800/80 backdrop-blur-xl rounded-2xl p-4 sm:p-6 shadow-2xl">
