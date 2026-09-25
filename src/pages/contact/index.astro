@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { slide } from "astro:transitions";
+import { smoothPageTransition } from "@/lib/transitions";
 import GithubIcon from "@/components/Icons/GithubIcon.astro";
 import LinkedinIcon from "@/components/Icons/LinkedinIcon.astro";
 import GmailIcon from "@/components/Icons/GmailIcon.astro";
@@ -10,9 +10,7 @@ import GmailIcon from "@/components/Icons/GmailIcon.astro";
   <main
     class="min-h-screen w-full flex flex-col justify-center items-center pt-28 pb-20 px-4 sm:px-8 lg:px-12"
     transition:name="main"
-    transition:animate={slide({
-      duration: "0.8s",
-    })}
+    transition:animate={smoothPageTransition}
   >
     <!-- Contenedor Principal con efecto 3D -->
     <div class="contact-wrapper w-full max-w-7xl mx-auto flex flex-col items-center">

@@ -1,15 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import GithubContributions from "@/components/GithubContributions.astro";
-import { slide } from "astro:transitions";
+import { smoothPageTransition } from "@/lib/transitions";
 ---
 
 <Layout title="Contribuciones | Carlos Gaubert">
   <main
     class="min-h-screen w-full pt-28 pb-24 px-4 sm:px-8 max-w-7xl mx-auto flex flex-col items-center"
-    transition:animate={slide({
-      duration: "0.8s",
-    })}
+    transition:animate={smoothPageTransition}
     transition:name="main"
   >
     <!-- Encabezado de la Sección -->

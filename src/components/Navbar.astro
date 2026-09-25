@@ -20,10 +20,27 @@ function isPathActive(href: string) {
 ---
 
 <nav
-  transition:persist
+  transition:persist="main-navbar"
   class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pt-4 px-2 sm:px-4 pointer-events-none"
 >
-  <div class="pointer-events-auto bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-xl rounded-full px-3 sm:px-5 py-2 sm:py-2.5 shadow-2xl flex items-center space-x-1 sm:space-x-2.5 text-xs sm:text-sm font-medium overflow-x-auto max-w-[95vw] scrollbar-none">
+  <div
+    id="navbar-container"
+    class="relative pointer-events-auto bg-zinc-950/85 border border-zinc-800/80 backdrop-blur-xl rounded-full p-1.5 shadow-2xl flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium overflow-x-auto max-w-[95vw] scrollbar-none"
+  >
+    <!-- Pastilla de hover sutil -->
+    <div
+      id="nav-hover-pill"
+      class="nav-pill pointer-events-none absolute top-0 left-0 m-0 rounded-full bg-white/[0.07] border border-white/5 opacity-0 z-0 will-change-transform"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Pastilla activa con gradiente luminoso y animación de deslizamiento ultra suave -->
+    <div
+      id="nav-active-pill"
+      class="nav-pill pointer-events-none absolute top-0 left-0 m-0 rounded-full bg-gradient-to-r from-[#00ccff]/25 to-[#d500f9]/25 border border-[#00ccff]/50 shadow-[0_0_16px_rgba(0,204,255,0.3)] backdrop-blur-sm opacity-0 z-0 will-change-transform"
+      aria-hidden="true"
+    ></div>
+
     {
       navItems.map((item) => {
         const active = isPathActive(item.href);
@@ -32,10 +49,10 @@ function isPathActive(href: string) {
             href={item.href}
             data-nav-link
             data-href={item.href}
-            class={`nav-link px-2.5 sm:px-3 py-1.5 rounded-full transition-all duration-300 border flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
+            class={`nav-link relative z-10 px-3 sm:px-3.5 py-1.5 rounded-full flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 transition-colors duration-200 select-none ${
               active
-                ? "bg-gradient-to-r from-[#00ccff]/20 to-[#d500f9]/20 text-white border-[#00ccff]/50 shadow-[0_0_12px_rgba(0,204,255,0.3)]"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/60 border-transparent"
+                ? "text-white font-semibold drop-shadow-[0_0_10px_rgba(0,204,255,0.4)] is-active"
+                : "text-zinc-400 hover:text-white"
             }`}
           >
             {item.isGithub && (
@@ -51,45 +68,145 @@ function isPathActive(href: string) {
   </div>
 </nav>
 
-<script>
-  const activeClasses = [
-    "bg-gradient-to-r",
-    "from-[#00ccff]/20",
-    "to-[#d500f9]/20",
-    "text-white",
-    "border-[#00ccff]/50",
-    "shadow-[0_0_12px_rgba(0,204,255,0.3)]",
-  ];
-
-  const inactiveClasses = [
-    "text-zinc-400",
-    "hover:text-white",
-    "hover:bg-zinc-800/60",
-    "border-transparent",
-  ];
-
-  function updateActiveNavLink() {
-    const current = window.location.pathname.replace(/\/+$/, "");
-    const links = document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]");
-
-    links.forEach((link) => {
-      const rawHref = link.getAttribute("data-href") || link.getAttribute("href") || "";
-      const cleanHref = rawHref.replace(/\/+$/, "");
-
-      const isHome = cleanHref === "" || cleanHref === "/portafolio-carlos-astro";
-      const isCurrentHome = current === "" || current === "/portafolio-carlos-astro";
-
-      const isActive = isHome ? isCurrentHome : current.startsWith(cleanHref);
-
-      if (isActive) {
-        link.classList.remove(...inactiveClasses);
-        link.classList.add(...activeClasses);
-      } else {
-        link.classList.remove(...activeClasses);
-        link.classList.add(...inactiveClasses);
-      }
-    });
+<style>
+  /* Curva y transición suave para el indicador activo */
+  #nav-active-pill {
+    transition:
+      transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.2s ease;
   }
 
-  document.addEventListener("astro:page-load", updateActiveNavLink);
+  /* Transición ágil para el hover */
+  #nav-hover-pill {
+    transition:
+      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.15s ease;
+  }
+
+  /* Fallback estático antes de que el script calibre la posición de la píldora */
+  #navbar-container:not(.js-ready) .nav-link.is-active {
+    background: linear-gradient(to right, rgba(0, 204, 255, 0.2), rgba(213, 0, 249, 0.2));
+    border: 1px solid rgba(0, 204, 255, 0.5);
+    box-shadow: 0 0 12px rgba(0, 204, 255, 0.3);
+  }
+</style>
+
+<script>
+  function setupNavbar() {
+    const container = document.getElementById("navbar-container");
+    const activePill = document.getElementById("nav-active-pill");
+    const hoverPill = document.getElementById("nav-hover-pill");
+    if (!container || !activePill) return;
+
+    function getActiveLink(): HTMLAnchorElement | null {
+      const current = window.location.pathname.replace(/\/+$/, "");
+      const links = Array.from(container!.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"));
+
+      for (const link of links) {
+        const rawHref = link.getAttribute("data-href") || link.getAttribute("href") || "";
+        const cleanHref = rawHref.replace(/\/+$/, "");
+        const isHome = cleanHref === "" || cleanHref === "/portafolio-carlos-astro";
+        const isCurrentHome = current === "" || current === "/portafolio-carlos-astro";
+        if (isHome && isCurrentHome) return link;
+        if (!isHome && current.startsWith(cleanHref)) return link;
+      }
+      return null;
+    }
+
+    function positionPill(pill: HTMLElement, targetEl: HTMLElement, animate = true) {
+      if (!targetEl || !pill) return;
+
+      const left = targetEl.offsetLeft;
+      const top = targetEl.offsetTop;
+      const width = targetEl.offsetWidth;
+      const height = targetEl.offsetHeight;
+
+      if (!animate) {
+        const prevTransition = pill.style.transition;
+        pill.style.transition = "none";
+        pill.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+        pill.style.width = `${width}px`;
+        pill.style.height = `${height}px`;
+        pill.style.opacity = "1";
+        // Forzar reflujo
+        void pill.offsetHeight;
+        pill.style.transition = prevTransition;
+      } else {
+        pill.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+        pill.style.width = `${width}px`;
+        pill.style.height = `${height}px`;
+        pill.style.opacity = "1";
+      }
+    }
+
+    function syncActiveLink(targetLink: HTMLAnchorElement | null, animate = true) {
+      const links = container!.querySelectorAll<HTMLAnchorElement>("[data-nav-link]");
+      links.forEach((l) => {
+        if (l === targetLink) {
+          l.classList.remove("text-zinc-400");
+          l.classList.add("text-white", "font-semibold", "drop-shadow-[0_0_10px_rgba(0,204,255,0.4)]", "is-active");
+        } else {
+          l.classList.remove("text-white", "font-semibold", "drop-shadow-[0_0_10px_rgba(0,204,255,0.4)]", "is-active");
+          l.classList.add("text-zinc-400");
+        }
+      });
+
+      if (targetLink) {
+        positionPill(activePill!, targetLink, animate);
+        container!.classList.add("js-ready");
+      }
+    }
+
+    // Inicializar o sincronizar
+    const currentActive = getActiveLink();
+    if (currentActive) {
+      // Si la píldora aún no es visible, posicionar sin animación inicial
+      const isVisible = activePill.style.opacity === "1";
+      syncActiveLink(currentActive, isVisible);
+    }
+
+    // Enlazar eventos de clics y hovers a los enlaces
+    const links = container.querySelectorAll<HTMLAnchorElement>("[data-nav-link]");
+    links.forEach((link) => {
+      if ((link as any).__boundNavListeners) return;
+      (link as any).__boundNavListeners = true;
+
+      // Al hacer clic, mover inmediatamente la píldora (feedback instantáneo al usuario)
+      link.addEventListener("click", () => {
+        syncActiveLink(link, true);
+        if (hoverPill) hoverPill.style.opacity = "0";
+      });
+
+      // Hover sutil
+      link.addEventListener("mouseenter", () => {
+        const isCurrent = link.classList.contains("is-active");
+        if (hoverPill && !isCurrent) {
+          positionPill(hoverPill, link, true);
+        } else if (hoverPill) {
+          hoverPill.style.opacity = "0";
+        }
+      });
+    });
+
+    if (!(container as any).__boundNavContainer) {
+      (container as any).__boundNavContainer = true;
+
+      container.addEventListener("mouseleave", () => {
+        if (hoverPill) hoverPill.style.opacity = "0";
+      });
+
+      window.addEventListener("resize", () => {
+        const active = getActiveLink();
+        if (active) syncActiveLink(active, false);
+      });
+    }
+  }
+
+  // Inicializar en primera carga y en cada navegación de Astro
+  document.addEventListener("DOMContentLoaded", () => setupNavbar());
+  document.addEventListener("astro:page-load", () => setupNavbar());
 </script>

@@ -1,15 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import ProfileImage from "@/components/ProfileImage.astro";
-import { slide } from "astro:transitions";
+import { smoothPageTransition } from "@/lib/transitions";
 ---
 
 <Layout title="Carlos Gaubert | Portafolio">
   <main
     class="flex flex-col items-center justify-center min-h-screen w-full md:mb-0"
-    transition:animate={slide({
-      duration: "0.8s",
-    })}
+    transition:animate={smoothPageTransition}
     transition:name="main"
   >
     <div class="flex md:flex-row flex-col flex-grow flex-1 w-full pt-5 md:pt-0 items-center justify-between">

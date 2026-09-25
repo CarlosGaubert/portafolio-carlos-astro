@@ -39,6 +39,23 @@ const { title } = Astro.props;
 
     <script is:inline>
       (function () {
+        // Promover el contenedor de estrellas y el brillo al elemento raíz <html>
+        // De esta manera nunca son desmontados ni afectados por el reemplazo del <body> en Astro
+        function promotePersistentBackground() {
+          const stars = document.getElementById("stars-container");
+          if (stars && stars.parentElement !== document.documentElement) {
+            document.documentElement.appendChild(stars);
+          }
+          const glow = document.getElementById("cursor-glow");
+          if (glow && glow.parentElement !== document.documentElement) {
+            document.documentElement.appendChild(glow);
+          }
+        }
+        promotePersistentBackground();
+
+        if (window.__cursorGlowInitialized) return;
+        window.__cursorGlowInitialized = true;
+
         let mouseX = -1000;
         let mouseY = -1000;
         let currentX = -1000;
@@ -79,41 +96,34 @@ const { title } = Astro.props;
     </script>
 
     <script>
-      // Preservar la continuidad fluida de las animaciones de las estrellas
-      let starAnimationStates: { name: string; currentTime: CSSNumberish | null }[][] = [];
-
-      document.addEventListener("astro:before-swap", () => {
-        const stars = document.querySelectorAll("#stars-container .star");
-        starAnimationStates = Array.from(stars).map((star) => {
-          return star.getAnimations().map((anim) => ({
-            name: "animationName" in anim ? (anim as any).animationName : "",
-            currentTime: anim.currentTime,
-          }));
-        });
-      });
-
-      document.addEventListener("astro:after-swap", () => {
-        const stars = document.querySelectorAll("#stars-container .star");
-        stars.forEach((star, index) => {
-          const savedAnims = starAnimationStates[index];
-          if (!savedAnims) return;
-
-          requestAnimationFrame(() => {
-            const currentAnims = star.getAnimations();
-            currentAnims.forEach((anim) => {
-              const animName = "animationName" in anim ? (anim as any).animationName : "";
-              const saved = savedAnims.find((sa) => sa.name === animName);
-              if (saved && saved.currentTime !== null) {
-                anim.currentTime = saved.currentTime;
-              }
-            });
-          });
-        });
+      // Evitar que el nuevo documento cree duplicados en el body durante la navegación
+      document.addEventListener("astro:before-swap", (e: any) => {
+        if (e.newDocument) {
+          const newStars = e.newDocument.getElementById("stars-container");
+          if (newStars) newStars.remove();
+          const newGlow = e.newDocument.getElementById("cursor-glow");
+          if (newGlow) newGlow.remove();
+        }
       });
     </script>
     <style is:global>
+      :root,
+      html {
+        view-transition-name: none !important;
+      }
+
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        display: none !important;
+        animation: none !important;
+      }
+
       #stars-container,
       #stars-container * {
+        view-transition-name: none !important;
+      }
+
+      #cursor-glow {
         view-transition-name: none !important;
       }
       body {
@@ -251,6 +261,44 @@ const { title } = Astro.props;
         z-index: 1;
         mix-blend-mode: screen;
         will-change: transform, opacity;
+      }
+
+      @keyframes smoothFadeOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes smoothFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        @keyframes smoothFadeOut {
+          to {
+            opacity: 0;
+          }
+        }
+        @keyframes smoothFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
       }
     </style>
   </body>
