@@ -21,7 +21,7 @@ const { title } = Astro.props;
   </head>
   <body>
     <Navbar />
-    <div id="stars-container" transition:persist="stars-bg" class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div id="stars-container" transition:persist="stars-bg" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
       <div class="star star1"></div>
       <div class="star star2"></div>
       <div class="star star3"></div>
@@ -39,16 +39,16 @@ const { title } = Astro.props;
 
     <script is:inline>
       (function () {
-        // Promover el contenedor de estrellas y el brillo al elemento raíz <html>
-        // De esta manera nunca son desmontados ni afectados por el reemplazo del <body> en Astro
+        // Promover el contenedor de estrellas y el brillo al elemento raíz <html> antes del body
+        // De esta manera se mantienen continuos durante transiciones pero SIEMPRE detrás del contenido
         function promotePersistentBackground() {
           const stars = document.getElementById("stars-container");
           if (stars && stars.parentElement !== document.documentElement) {
-            document.documentElement.appendChild(stars);
+            document.documentElement.insertBefore(stars, document.body);
           }
           const glow = document.getElementById("cursor-glow");
           if (glow && glow.parentElement !== document.documentElement) {
-            document.documentElement.appendChild(glow);
+            document.documentElement.insertBefore(glow, document.body);
           }
         }
         promotePersistentBackground();
@@ -123,6 +123,13 @@ const { title } = Astro.props;
         view-transition-name: none !important;
       }
 
+      #stars-container {
+        position: fixed;
+        inset: 0;
+        z-index: -10;
+        pointer-events: none;
+      }
+
       #cursor-glow {
         view-transition-name: none !important;
       }
@@ -160,6 +167,8 @@ const { title } = Astro.props;
       body {
         margin: 0;
         height: 100dvh;
+        position: relative;
+        z-index: 1;
       }
 
       .star {
@@ -169,6 +178,7 @@ const { title } = Astro.props;
         width: 100%;
         height: 100%;
         pointer-events: none;
+        z-index: -10;
         animation:
           animate 8s ease-in-out infinite,
           backgroundmove 16s linear infinite;
@@ -258,7 +268,7 @@ const { title } = Astro.props;
         transform: translate3d(-1000px, -1000px, 0) translate(-50%, -50%);
         opacity: 0;
         transition: opacity 0.3s ease;
-        z-index: 1;
+        z-index: -5;
         mix-blend-mode: screen;
         will-change: transform, opacity;
       }
