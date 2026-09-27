@@ -1,10 +1,16 @@
 ---
 const currentPath = Astro.url.pathname;
 
-const navItems = [
+interface NavItem {
+  name: string;
+  href: string;
+  isGithub?: boolean;
+}
+
+const navItems: NavItem[] = [
   { name: "Inicio", href: "/portafolio-carlos-astro/" },
   { name: "Proyectos", href: "/portafolio-carlos-astro/projects/" },
-  { name: "Contribuciones", href: "/portafolio-carlos-astro/contributions/", isGithub: true },
+  // { name: "Contribuciones", href: "/portafolio-carlos-astro/contributions/", isGithub: true },
   { name: "Experiencia", href: "/portafolio-carlos-astro/experience/" },
   { name: "Contacto", href: "/portafolio-carlos-astro/contact/" },
 ];
