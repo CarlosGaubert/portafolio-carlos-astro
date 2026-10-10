@@ -551,7 +551,7 @@ const allLanguages = Array.from(
         const nonForkRepos = repos.filter((r) => !r.fork);
         if (nonForkRepos.length === 0) return;
 
-        allProjects = nonForkRepos.map((repo) => {
+        const newProjects = nonForkRepos.map((repo) => {
           const desc = repo.description || "Sin descripción disponible.";
           return {
             nameProject: repo.name,
@@ -561,18 +561,25 @@ const allLanguages = Array.from(
           };
         });
 
-        const badge = document.getElementById("github-sync-badge");
-        if (badge) badge.textContent = `GitHub en Vivo (${allProjects.length} repositorios)`;
+        const isDifferent = newProjects.length !== allProjects.length ||
+          newProjects.some((np, i) => np.nameProject !== allProjects[i]?.nameProject);
 
-        renderFilterButtons();
-        renderProjects();
+        if (isDifferent) {
+          allProjects = newProjects;
+          const badge = document.getElementById("github-sync-badge");
+          if (badge) badge.textContent = `GitHub en Vivo (${allProjects.length} repositorios)`;
+
+          renderFilterButtons();
+          renderProjects();
+        }
       } catch (e) {
         console.error("Error sincronizando repositorios desde GitHub:", e);
       }
     }
 
     renderFilterButtons();
-    renderProjects();
+    // Las tarjetas iniciales ya vienen renderizadas en el HTML estático de Astro;
+    // evitamos destruir y recrear el DOM en la primera carga para máxima fluidez.
     syncLiveFromGitHub();
   }
 
@@ -581,26 +588,21 @@ const allLanguages = Array.from(
 </script>
 
 <style is:global>
-  /* Animación de entrada suave y escalonada para las tarjetas filtradas */
+  /* Animación de entrada suave por hardware GPU para las tarjetas */
   @keyframes cardFilterEntrance {
     0% {
       opacity: 0;
-      transform: translateY(22px) scale(0.95);
-    }
-    60% {
-      opacity: 0.85;
-      transform: translateY(-2px) scale(1.01);
+      transform: translate3d(0, 18px, 0) scale(0.96);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translate3d(0, 0, 0) scale(1);
     }
   }
 
   .project-card {
-    animation: cardFilterEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: cardFilterEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--card-delay, 0ms);
-    will-change: opacity, transform;
   }
 
   /* Contador animado */

@@ -93,12 +93,14 @@ const delayMs = Math.min(index * 35, 350);
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    background: rgba(20, 20, 24, 0.85);
+    background: rgba(18, 18, 22, 0.92);
     border: 1px solid rgba(63, 63, 70, 0.5);
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
+    content-visibility: auto;
+    contain-intrinsic-size: 0 290px;
     transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   }
 

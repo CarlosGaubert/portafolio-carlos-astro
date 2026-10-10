@@ -1,5 +1,5 @@
 ---
-const imageUrl = "/portafolio-carlos-astro/avatar.jpg";
+const imageUrl = "/portafolio-carlos-astro/avatar.webp";
 ---
 
 <div
@@ -9,6 +9,10 @@ const imageUrl = "/portafolio-carlos-astro/avatar.jpg";
   <img
     src={imageUrl}
     alt="Perfil"
+    width="384"
+    height="384"
+    loading="eager"
+    decoding="async"
     class="w-full h-full object-cover transform transition-transform duration-500"
   />
 </div>

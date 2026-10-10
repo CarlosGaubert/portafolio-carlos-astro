@@ -138,9 +138,9 @@ function isPathActive(href: string) {
         pill.style.width = `${width}px`;
         pill.style.height = `${height}px`;
         pill.style.opacity = "1";
-        // Forzar reflujo
-        void pill.offsetHeight;
-        pill.style.transition = prevTransition;
+        requestAnimationFrame(() => {
+          pill.style.transition = prevTransition;
+        });
       } else {
         pill.style.transform = `translate3d(${left}px, ${top}px, 0)`;
         pill.style.width = `${width}px`;

@@ -60,11 +60,17 @@ const { title } = Astro.props;
         if (window.__cursorGlowInitialized) return;
         window.__cursorGlowInitialized = true;
 
+        // Desactivar en dispositivos sin puntero de precisión (táctil / móvil) para ahorrar recursos
+        const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+        if (!isFinePointer) return;
+
         let mouseX = -1000;
         let mouseY = -1000;
         let currentX = -1000;
         let currentY = -1000;
         let isVisible = false;
+        let isAnimating = false;
+        let isTransitioning = false;
 
         function getGlowEl() {
           return document.getElementById("cursor-glow");
@@ -78,7 +84,11 @@ const { title } = Astro.props;
             isVisible = true;
             glow.style.opacity = "1";
           }
-        });
+          if (!isAnimating && !isTransitioning) {
+            isAnimating = true;
+            requestAnimationFrame(animateCursorGlow);
+          }
+        }, { passive: true });
 
         document.addEventListener("mouseleave", function () {
           isVisible = false;
@@ -86,16 +96,41 @@ const { title } = Astro.props;
           if (glow) glow.style.opacity = "0";
         });
 
+        // Suspender el bucle rAF del cursor durante la animación de transición de página
+        document.addEventListener("astro:before-preparation", function () {
+          isTransitioning = true;
+        });
+        document.addEventListener("astro:page-load", function () {
+          isTransitioning = false;
+          promotePersistentBackground();
+        });
+
         function animateCursorGlow() {
+          if (!isAnimating) return;
+          if (isTransitioning) {
+            isAnimating = false;
+            return;
+          }
+
           const glow = getGlowEl();
           if (glow && isVisible) {
-            currentX += (mouseX - currentX) * 0.18;
-            currentY += (mouseY - currentY) * 0.18;
+            const dx = mouseX - currentX;
+            const dy = mouseY - currentY;
+            currentX += dx * 0.18;
+            currentY += dy * 0.18;
             glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+
+            // Suspender rAF cuando el mouse está en reposo (evita drenaje de CPU y GPU)
+            if (Math.abs(dx) < 0.2 && Math.abs(dy) < 0.2) {
+              isAnimating = false;
+              return;
+            }
+          } else {
+            isAnimating = false;
+            return;
           }
           requestAnimationFrame(animateCursorGlow);
         }
-        requestAnimationFrame(animateCursorGlow);
       })();
     </script>
 
@@ -132,6 +167,9 @@ const { title } = Astro.props;
         inset: 0;
         z-index: -10;
         pointer-events: none;
+        contain: strict;
+        transform: translateZ(0);
+        will-change: transform;
       }
 
       #cursor-glow {
@@ -183,6 +221,10 @@ const { title } = Astro.props;
         height: 100%;
         pointer-events: none;
         z-index: -10;
+        contain: paint;
+        backface-visibility: hidden;
+        transform: translate3d(0, 0, 0);
+        will-change: transform, opacity;
         animation:
           animate 8s ease-in-out infinite,
           backgroundmove 16s linear infinite;
@@ -190,42 +232,42 @@ const { title } = Astro.props;
 
       .star1 {
         animation-delay: 0s;
-        background: url("/portafolio-carlos-astro/stars/star1.png");
+        background: url("/portafolio-carlos-astro/stars/star1.webp");
       }
 
       .star2 {
         animation-delay: -1s;
-        background: url("/portafolio-carlos-astro/stars/star2.png");
+        background: url("/portafolio-carlos-astro/stars/star2.webp");
       }
 
       .star3 {
         animation-delay: -2s;
-        background: url("/portafolio-carlos-astro/stars/star3.png");
+        background: url("/portafolio-carlos-astro/stars/star3.webp");
       }
 
       .star4 {
         animation-delay: -3s;
-        background: url("/portafolio-carlos-astro/stars/star4.png");
+        background: url("/portafolio-carlos-astro/stars/star4.webp");
       }
 
       .star5 {
         animation-delay: -4s;
-        background: url("/portafolio-carlos-astro/stars/star5.png");
+        background: url("/portafolio-carlos-astro/stars/star5.webp");
       }
 
       .star6 {
         animation-delay: -5s;
-        background: url("/portafolio-carlos-astro/stars/star6.png");
+        background: url("/portafolio-carlos-astro/stars/star6.webp");
       }
 
       .star7 {
         animation-delay: -6s;
-        background: url("/portafolio-carlos-astro/stars/star7.png");
+        background: url("/portafolio-carlos-astro/stars/star7.webp");
       }
 
       .star8 {
         animation-delay: -7s;
-        background: url("/portafolio-carlos-astro/stars/star8.png");
+        background: url("/portafolio-carlos-astro/stars/star8.webp");
       }
 
       @keyframes animate {
@@ -248,10 +290,10 @@ const { title } = Astro.props;
 
       @keyframes backgroundmove {
         0% {
-          transform: scale(1);
+          transform: translate3d(0, 0, 0) scale(1);
         }
         100% {
-          transform: scale(2);
+          transform: translate3d(0, 0, 0) scale(2);
         }
       }
 
@@ -273,33 +315,48 @@ const { title } = Astro.props;
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: -5;
-        mix-blend-mode: screen;
+        contain: strict;
+        will-change: transform, opacity;
+      }
+
+      ::view-transition-group(main) {
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, opacity;
+      }
+
+      ::view-transition-old(main),
+      ::view-transition-new(main) {
+        backface-visibility: hidden;
+        transform: translateZ(0);
         will-change: transform, opacity;
       }
 
       @keyframes smoothFadeOut {
         from {
           opacity: 1;
-          transform: translateY(0);
+          transform: translate3d(0, 0, 0);
         }
         to {
           opacity: 0;
-          transform: translateY(-8px);
+          transform: translate3d(0, -8px, 0);
         }
       }
 
       @keyframes smoothFadeIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translate3d(0, 10px, 0);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translate3d(0, 0, 0);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
+        .star {
+          animation: animate 12s ease-in-out infinite !important;
+        }
         @keyframes smoothFadeOut {
           to {
             opacity: 0;
