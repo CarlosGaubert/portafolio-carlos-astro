@@ -54,9 +54,18 @@ import GmailIcon from "@/components/Icons/GmailIcon.astro";
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-xs font-medium text-zinc-400">Correo Electrónico</p>
-                    <p class="text-xs sm:text-sm font-semibold text-zinc-100 truncate" id="email-text">
-                      carlosgaubertquijada@gmail.com
-                    </p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <p class="text-xs sm:text-sm font-semibold text-zinc-100 truncate tracking-wide" id="email-text">
+                        carlos•••••••••@gmail.com
+                      </p>
+                      <button
+                        id="reveal-email-btn"
+                        type="button"
+                        class="text-[10px] text-zinc-400 hover:text-[#00ccff] px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700/80 border border-zinc-700 hover:border-[#00ccff]/40 transition-all cursor-pointer font-medium"
+                      >
+                        Mostrar
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -73,8 +82,9 @@ import GmailIcon from "@/components/Icons/GmailIcon.astro";
                   </button>
 
                   <a
-                    href="mailto:carlosgaubertquijada@gmail.com"
-                    class="text-xs text-[#00ccff] hover:underline font-semibold flex items-center gap-1"
+                    id="send-email-link"
+                    href="#"
+                    class="text-xs text-[#00ccff] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                   >
                     Enviar correo &rarr;
                   </a>
@@ -230,16 +240,51 @@ import GmailIcon from "@/components/Icons/GmailIcon.astro";
       container.addEventListener("mouseleave", handleMouseLeave);
     }
 
-    // 2. Función para copiar email al portapapeles con feedback visual
+    // Decodificación segura de email para evitar indexación y scrapers de spam
+    const getEmail = () => atob("Y2FybG9zZ2F1YmVydHF1aWphZGFAZ21haWwuY29t");
+    const maskedEmail = "carlos•••••••••@gmail.com";
+
+    // 2. Control de revelación y copia de email
+    const emailText = document.getElementById("email-text");
+    const revealBtn = document.getElementById("reveal-email-btn");
     const copyBtn = document.getElementById("copy-email-btn");
     const copyText = document.getElementById("copy-text");
     const copyToast = document.getElementById("copy-toast");
-    const emailToCopy = "carlosgaubertquijada@gmail.com";
+    const sendEmailLink = document.getElementById("send-email-link");
+
+    let isRevealed = false;
+
+    const setRevealed = (revealed) => {
+      isRevealed = revealed;
+      if (emailText) {
+        emailText.textContent = isRevealed ? getEmail() : maskedEmail;
+      }
+      if (revealBtn) {
+        revealBtn.textContent = isRevealed ? "Ocultar" : "Mostrar";
+      }
+    };
+
+    if (revealBtn) {
+      revealBtn.addEventListener("click", () => {
+        setRevealed(!isRevealed);
+      });
+    }
+
+    if (sendEmailLink) {
+      sendEmailLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `mailto:${getEmail()}`;
+      });
+    }
 
     if (copyBtn && copyText) {
       copyBtn.addEventListener("click", async () => {
         try {
-          await navigator.clipboard.writeText(emailToCopy);
+          const email = getEmail();
+          await navigator.clipboard.writeText(email);
+
+          // Revelar visualmente el correo tras copiar
+          setRevealed(true);
 
           copyText.textContent = "¡Copiado!";
           copyBtn.classList.add("border-emerald-500", "text-emerald-400");
@@ -276,7 +321,7 @@ import GmailIcon from "@/components/Icons/GmailIcon.astro";
         const fullSubject = encodeURIComponent(`[Portafolio] ${subject} - ${name}`);
         const fullBody = encodeURIComponent(`Hola Carlos,\n\nMi nombre es ${name}.\n\n${message}`);
 
-        window.location.href = `mailto:carlosgaubertquijada@gmail.com?subject=${fullSubject}&body=${fullBody}`;
+        window.location.href = `mailto:${getEmail()}?subject=${fullSubject}&body=${fullBody}`;
       });
     }
   }
